@@ -704,9 +704,9 @@
 
   <div class="footplate">
     <span class="riv l"></span><span class="riv r"></span>
-    <h3 data-i18n="foot_title">Нейро-станция «МНИСТ-1» · зав. № 0001</h3>
+    <h3 data-i18n="foot_title">Нейро-станция «МНИСТ-1» · ТУ 784.30.10-86</h3>
     <p data-i18n-html="foot_text">Основано на книге Майкла Нильсена <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> и его работе.</p>
-    <div class="gost" data-i18n="foot_gost">ВЫЧИСЛИТЕЛЬ «АЛДАН-3» · СДЕЛАНО В БРАУЗЕРЕ · ГОСТ 784-30-10 · 1986 г.</div>
+    <div class="gost" data-i18n="foot_gost">ВЫЧИСЛИТЕЛЬ «АЛДАН-3»</div>
     <div class="gost motto" data-i18n="foot_motto">«Понедельник начинается в субботу»</div>
   </div>
 </div>
@@ -808,9 +808,9 @@ const ln=(l,v)=>(l+' ').padEnd(21,'.')+' '+v;   // строка протокол
 const I18N={
   ru:{title_top:'Нейро-станция',title_main:'«МНИСТ-1»',subtitle:'система распознавания рукописных цифр · борт № 784-30-10',
     serial:'ТУ 784.30.10-86 · разработка НИИЧАВО, г. Соловец · изд. 001 · СССР',
-    foot_title:'Нейро-станция «МНИСТ-1» · зав. № 0001',
+    foot_title:'Нейро-станция «МНИСТ-1» · ТУ 784.30.10-86',
     foot_text:'Основано на книге Майкла Нильсена <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> и его работе.',
-    foot_gost:'ВЫЧИСЛИТЕЛЬ «АЛДАН-3» · СДЕЛАНО В БРАУЗЕРЕ · ГОСТ 784-30-10 · 1986 г.',
+    foot_gost:'ВЫЧИСЛИТЕЛЬ «АЛДАН-3»',
     foot_motto:'«Понедельник начинается в субботу»',proto_motto:'«СЧАСТЬЕ ЧЕЛОВЕЧЕСКОЕ — В НЕПРЕРЫВНОМ ПОЗНАНИИ НЕИЗВЕСТНОГО»',
     mocknote:'Настоящая сеть 784→30→10, собранная с нуля (init · forward · backward · SGD). Обучение и распознавание — по-честному, на реальном MNIST.',
     p_input:'Ручной ввод образа',clear:'Очистка',sample:'Образец',hint_draw:'Начертите цифру пером. Станция распознаёт справа. До обучения — гадает наугад.',
@@ -836,9 +836,9 @@ const I18N={
     gal:(n,cap)=>`Скрытый слой · что выучили ${n} нейронов`+(cap?' (показаны 50)':'')},
   en:{title_top:'Neural Station',title_main:'«MNIST-1»',subtitle:'handwritten-digit recognition system · unit no. 784-30-10',
     serial:'Spec 784.30.10-86 · developed at NITWiT, Solovets · unit 001 · USSR',
-    foot_title:'Neuro-Station «MNIST-1» · serial no. 0001',
+    foot_title:'Neuro-Station «MNIST-1» · Spec 784.30.10-86',
     foot_text:'Based on Michael Nielsen\'s book <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> and his work.',
-    foot_gost:'ALDAN-3 COMPUTER · MADE IN A BROWSER · GOST 784-30-10 · 1986',
+    foot_gost:'ALDAN-3 COMPUTER',
     foot_motto:'“Monday starts on Saturday”',proto_motto:'“HUMAN HAPPINESS LIES IN THE CEASELESS LEARNING OF THE UNKNOWN”',
     mocknote:'A real 784→30→10 network built from scratch (init · forward · backward · SGD). Training and recognition are genuine, on actual MNIST.',
     p_input:'Manual image input',clear:'Clear',sample:'Sample',hint_draw:'Draw a digit with the pen. The station recognizes it on the right. Before training it just guesses.',
