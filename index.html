@@ -796,6 +796,7 @@ await (async()=>{
   const RU=(navigator.language||'ru').toLowerCase().startsWith('ru');
   const LBL=RU?'ЗАГРУЗКА ФОНДА ДАННЫХ':'LOADING DATA STOCK';
   if(!RU){
+    document.title='NEURO-STATION «MNIST-1»';   // заголовок вкладки — тоже по локали, и сразу
     const bt=document.querySelector('.btitle');
     if(bt)bt.innerHTML='<span class="bt1">★ COMRADE ★</span><span class="bt2"><em>Teach</em> the machine to read digits</span><span class="bt3">a real neural network — right in your browser</span>';
     if(bl)bl.textContent=LBL+'…';
@@ -947,6 +948,7 @@ const I18N={
     gal:(n,cap)=>`Hidden layer · what ${n} neurons learned`+(cap?' (showing 50)':'')}};
 let LANG='ru';const t=k=>I18N[LANG][k];
 function setLang(lang){LANG=lang;document.documentElement.lang=lang;
+  document.title=lang==='ru'?'НЕЙРО-СТАНЦИЯ «МНИСТ-1»':'NEURO-STATION «MNIST-1»';
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{el.innerHTML=t(el.dataset.i18nHtml);});
   $('phaseTxt').textContent=t(S.phase==='untrained'?'ph_wait':S.phase==='training'?(S.diverge?'ph_diverge':'ph_train'):'ph_done');
