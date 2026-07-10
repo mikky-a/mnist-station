@@ -441,6 +441,9 @@
     background:#060807 radial-gradient(circle at 50% 44%,#131a15 0,#040504 72%);transition:opacity 1.7s ease-in}
   .boot.off{opacity:0;pointer-events:none}
   .bootbox{display:flex;flex-direction:column;align-items:center;gap:16px}
+  .btitle{font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif;font-weight:900;font-size:clamp(1.05rem,3.4vw,1.5rem);
+    letter-spacing:.2em;text-transform:uppercase;color:#c3c9c1;text-align:center;line-height:1.4;max-width:480px;
+    margin-bottom:10px;text-shadow:0 2px 3px #000c,0 0 18px #5be07022}
   .bplate{background:#c9c1a4;color:#34332a;font-weight:800;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
     padding:5px 16px;border-radius:3px;border:1px solid #948a6f;box-shadow:inset 0 -1px 0 #0003,0 1px 3px #000c}
   /* пакетный поворотный рубильник: эмалевый корпус, латунная окантовка, тёплый карболит */
@@ -508,6 +511,7 @@
 <body class="preboot loading">
 <div class="boot" id="boot">
   <div class="bootbox">
+    <div class="btitle" data-i18n="boot_title">Обучи нейросеть прямо в&nbsp;браузере</div>
     <div class="bplate" data-i18n="mains">Сеть</div>
     <button class="mains" id="mainsSw" aria-label="включить питание">
       <span class="m0">0</span><span class="m1">I</span>
@@ -832,7 +836,7 @@ const I18N={
       ln('ВЕСОВ НАСТРОЕНО',w.toLocaleString('ru-RU')),ln('ОШИБКА',loss.toFixed(2)),ln('ТОЧНОСТЬ',acc.toFixed(0)+' %')],
     verd:acc=>acc>=85?'ГОДЕН':acc>=60?'УСЛОВНО ГОДЕН':'БРАК',verd_line:v=>'ЗАКЛЮЧЕНИЕ: '+v,
     stampw:acc=>acc>=60?'ОТК·1<br>ПРИНЯТО':'БРАК',etap:(e,n)=>`Этап ${e} / ${n} пройден`,
-    mains:'Сеть',mains_hint:'подать питание',helper_name:'тов. Полуэктов · научн. сотр.',helper_voice:'голос',
+    mains:'Сеть',mains_hint:'подать питание',boot_title:'Обучи нейросеть прямо в браузере',helper_name:'тов. Полуэктов · научн. сотр.',helper_voice:'голос',
     gal:(n,cap)=>`Скрытый слой · что выучили ${n} нейронов`+(cap?' (показаны 50)':'')},
   en:{title_top:'Neural Station',title_main:'«MNIST-1»',subtitle:'handwritten-digit recognition system',
     serial:'developed at NITWiT, Solovets · unit 001 · USSR',
@@ -860,7 +864,7 @@ const I18N={
       ln('WEIGHTS TUNED',w.toLocaleString('en-US')),ln('ERROR',loss.toFixed(2)),ln('ACCURACY',acc.toFixed(0)+' %')],
     verd:acc=>acc>=85?'PASS':acc>=60?'CONDITIONAL':'REJECT',verd_line:v=>'VERDICT: '+v,
     stampw:acc=>acc>=60?'QC·1<br>PASSED':'REJECT',etap:(e,n)=>`Stage ${e} / ${n} complete`,
-    mains:'Mains',mains_hint:'switch power on',helper_name:'Poluektov · research fellow',helper_voice:'voice',
+    mains:'Mains',mains_hint:'switch power on',boot_title:'Train a neural network right in your browser',helper_name:'Poluektov · research fellow',helper_voice:'voice',
     gal:(n,cap)=>`Hidden layer · what ${n} neurons learned`+(cap?' (showing 50)':'')}};
 let LANG='ru';const t=k=>I18N[LANG][k];
 function setLang(lang){LANG=lang;document.documentElement.lang=lang;
@@ -1535,7 +1539,7 @@ $('cEp').value=CFG.epochs;$('cEpV').textContent=CFG.epochs;
 buildGauge();renderFilm();buildMosaic();renderOdo();buildViz();resetTraining();
 setLang((navigator.language||'ru').toLowerCase().startsWith('ru')?'ru':'en');   // дефолт — язык браузера, переключалка работает как прежде
 document.body.classList.remove('loading');document.body.classList.add('pretap');   // данные готовы — ждём первого касания
-{const bl=$('bload');if(bl){bl.classList.add('ok');bl.textContent=LANG==='ru'?'К ПУСКУ ГОТОВО · КОСНИТЕСЬ ЭКРАНА':'READY · TAP ANYWHERE';}}
+{const bl=$('bload');if(bl){bl.classList.add('ok');bl.textContent=LANG==='ru'?'НАЖМИ ГДЕ УГОДНО ДЛЯ СТАРТА':'TAP ANYWHERE TO START';}}
 hWarm(['intro','start']);   // две сценарные реплики — заранее, остальное прогреется после включения
 /* интро — после первого касания: браузер даёт звук только после жеста, зато голос пойдёт синхронно с печатью */
 document.addEventListener('pointerdown',e=>{
