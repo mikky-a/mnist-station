@@ -500,9 +500,12 @@
     box-shadow:inset 0 2px 4px #000c,0 1px 0 #ffffff10}
   .bbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2c6e3a,#5be070);
     box-shadow:0 0 8px #5be07088;transition:width .15s}
-  body.loading .mains,body.loading .bplate{display:none}
-  body:not(.loading) .btitle,body:not(.loading) .bbar{display:none}
+  body.loading .mains,body.pretap .mains,body.loading .bplate,body.pretap .bplate{display:none}   /* тумблер — после первого касания */
+  body:not(.loading):not(.pretap) .btitle{display:none}
+  body:not(.loading) .bbar{display:none}
   body.loading .bhint,body.pretap .bhint{visibility:hidden}   /* «подать питание» — только после касания */
+  body:not(.loading):not(.pretap) .mains{animation:mainsIn .45s ease-out}
+  @keyframes mainsIn{from{opacity:0;transform:scale(.92)}}
   /* каскад: всё темно, блоки зажигаются по одному */
   body.booting .app>.top,body.booting .app>.tape,body.booting .app>.mocknote,body.booting .app .panel,body.booting .app>.footplate{
     filter:brightness(.02) saturate(.25);transition:filter .9s ease-out}
