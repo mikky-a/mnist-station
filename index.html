@@ -886,7 +886,10 @@ function hSpeak(key){
   hStopVoice();if(!hVoiceOn)return;
   if(!hAudio){hAudio=new Audio();hAudio.volume=.5;}   // голос тише механики: он рядом, а не из громкоговорителя
   hAudio.src='voice/neironov_'+key+(LANG==='ru'?'':'_en')+'.mp3';
-  hAudio.play().catch(err=>{
+  const t0=performance.now(),k0=key;
+  hAudio.play().then(()=>{
+    if(performance.now()-t0>2500||hKey!==k0)hStopVoice();           // голос опоздал к печати — лучше молчание, чем невпопад
+  }).catch(err=>{
     if(!(err&&err.name==='NotAllowedError'))                        // автоплей до первого клика — молчим, голос начнётся со «старта»
       hSpeakTTS((LANG==='ru'?HELP_RU:HELP_EN)[key]);                // а это файл реально не загрузился — последний резерв
   });
