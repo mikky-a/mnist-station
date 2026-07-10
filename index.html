@@ -751,6 +751,14 @@ const $=id=>document.getElementById(id);
 const DATA_RAW=62800094;   // точный размер mnist-data.js в байтах
 await (async()=>{
   const bl=$('bload'),bf=$('bbarF');
+  /* локаль загрузчика: setLang сработает позже, а плакат виден уже сейчас */
+  const RU=(navigator.language||'ru').toLowerCase().startsWith('ru');
+  const LBL=RU?'ЗАГРУЗКА ФОНДА ДАННЫХ':'LOADING DATA STOCK';
+  if(!RU){
+    const bt=document.querySelector('.btitle');
+    if(bt)bt.innerHTML='<span class="bt1">★ COMRADE ★</span><span class="bt2"><em>Teach</em> the machine to read digits</span><span class="bt3">a real neural network — right in your browser</span>';
+    if(bl)bl.textContent=LBL+'…';
+  }
   try{
     const r=await fetch('mnist-data.js');
     if(!r.ok||!r.body)throw 0;
@@ -758,7 +766,7 @@ await (async()=>{
     for(;;){const {done,value}=await rd.read();if(done)break;
       chunks.push(value);got+=value.length;
       const p=Math.min(99,(got/DATA_RAW*100)|0);
-      if(bl)bl.textContent='ЗАГРУЗКА ФОНДА ДАННЫХ · '+p+'%';
+      if(bl)bl.textContent=LBL+' · '+p+'%';
       if(bf)bf.style.width=p+'%';}
     const buf=new Uint8Array(got);let o=0;for(const c of chunks){buf.set(c,o);o+=c.length;}
     (0,eval)(new TextDecoder().decode(buf));
