@@ -1475,18 +1475,15 @@ function filmTick(dt){
 function renderFilm(){
   const c=$('film'),ctx=c.getContext('2d');
   ctx.fillStyle='#0a0c0a';ctx.fillRect(0,0,360,30);
-  const tmp=document.createElement('canvas');tmp.width=28;tmp.height=28;const tc=tmp.getContext('2d');
   ctx.imageSmoothingEnabled=false;
-  // по одному образцу каждой цифры 0–9, по порядку — витрина фонда
+  // по одному образцу каждой цифры 0–9, по порядку — витрина фонда;
+  // ВАЖНО: на каждый кадр — свой канвас (tileOf): Safari склеивает повторные drawImage одного источника
   const off=(Math.random()*TRAIN.length)|0;
   for(let d=0;d<10;d++){
     let sm=null;
     for(let k=0;k<TRAIN.length;k++){const cand=TRAIN[(off+k)%TRAIN.length];if(cand.label===d){sm=cand;break;}}
     if(!sm)continue;
-    const im=tc.createImageData(28,28);
-    for(let k=0;k<784;k++){const v=sm.x[k]*255,o=k*4;im.data[o]=v*0.45;im.data[o+1]=v*0.95;im.data[o+2]=v*0.5;im.data[o+3]=255;}
-    tc.putImageData(im,0,0);
-    ctx.drawImage(tmp,d*36+7,3,24,24);
+    ctx.drawImage(tileOf(sm),d*36+7,3,24,24);
     ctx.strokeStyle='#1e241f';ctx.strokeRect(d*36+6.5,2.5,25,25);
   }
 }
