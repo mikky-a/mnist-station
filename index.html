@@ -1470,7 +1470,7 @@ function renderFilm(){
 const bootT=[];const BT=(ms,f)=>bootT.push(setTimeout(f,ms));
 function powerOn(){
   const sw=$('mainsSw');if(sw.classList.contains('on'))return;
-  sw.classList.add('on');SFX.mainsBig();closeHelper();
+  sw.classList.add('on');SFX.mainsBig();hIntroShown=true;closeHelper();   // рубильник включён — интро уже не к месту
   document.body.classList.add('booting');
   /* секвенция света: щелчок → секунда темноты → цех проступает в полутьме → блоки вспыхивают */
   BT(900,()=>{$('boot').classList.add('off');document.body.classList.remove('preboot');});   // темнота держится, слышен только гул
@@ -1512,9 +1512,13 @@ $('cEp').value=CFG.epochs;$('cEpV').textContent=CFG.epochs;
 buildGauge();renderFilm();buildMosaic();renderOdo();buildViz();resetTraining();
 setLang((navigator.language||'ru').toLowerCase().startsWith('ru')?'ru':'en');   // дефолт — язык браузера, переключалка работает как прежде
 document.body.classList.remove('loading');   // данные загружены и декодированы — рубильник под напряжением
-{const bl=$('bload');if(bl){bl.classList.add('ok');bl.textContent=LANG==='ru'?'К ПУСКУ ГОТОВО':'READY TO START';}}
+{const bl=$('bload');if(bl){bl.classList.add('ok');bl.textContent=LANG==='ru'?'К ПУСКУ ГОТОВО · КОСНИТЕСЬ ЭКРАНА':'READY · TAP ANYWHERE';}}
 hWarm(['intro','start']);   // две сценарные реплики — заранее, остальное прогреется после включения
-setTimeout(introHelper,700);   // тов. Нейронов встречает ещё до включения станции
+/* интро — после первого касания: браузер даёт звук только после жеста, зато голос пойдёт синхронно с печатью */
+document.addEventListener('pointerdown',e=>{
+  if(e.target.closest&&e.target.closest('#mainsSw'))return;   // сразу дёрнул рубильник — сцена и так начинается
+  setTimeout(introHelper,150);
+},{once:true});
 </script>
 </body>
 </html>
