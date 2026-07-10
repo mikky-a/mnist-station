@@ -579,7 +579,7 @@
         <ellipse cx="42" cy="30" rx="27" ry="14" fill="#ffffff14"/>
       </svg>
       <div><h1><span class="t1" data-i18n="title_top">Нейро-станция</span><span class="t2" data-i18n="title_main">«МНИСТ-1»</span></h1>
-        <small data-i18n="subtitle">система распознавания рукописных цифр · борт № 784-30-10</small></div></div>
+        <small data-i18n="subtitle">система распознавания рукописных цифр</small></div></div>
     <div style="display:flex;gap:14px;align-items:center">
       <div class="vent" aria-hidden="true"></div>
       <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
@@ -806,8 +806,8 @@ document.addEventListener('click',()=>{userGestured=true;const c=ac();if(c&&c.st
 /* ---------- localization ---------- */
 const ln=(l,v)=>(l+' ').padEnd(21,'.')+' '+v;   // строка протокола: МЕТКА ...... значение
 const I18N={
-  ru:{title_top:'Нейро-станция',title_main:'«МНИСТ-1»',subtitle:'система распознавания рукописных цифр · борт № 784-30-10',
-    serial:'ТУ 784.30.10-86 · разработка НИИЧАВО, г. Соловец · изд. 001 · СССР',
+  ru:{title_top:'Нейро-станция',title_main:'«МНИСТ-1»',subtitle:'система распознавания рукописных цифр',
+    serial:'разработка НИИЧАВО, г. Соловец · изд. 001 · СССР',
     foot_title:'Нейро-станция «МНИСТ-1» · ТУ 784.30.10-86',
     foot_text:'Основано на книге Майкла Нильсена <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> и его работе.',
     foot_gost:'ВЫЧИСЛИТЕЛЬ «АЛДАН-3»',
@@ -834,8 +834,8 @@ const I18N={
     stampw:acc=>acc>=60?'ОТК·1<br>ПРИНЯТО':'БРАК',etap:(e,n)=>`Этап ${e} / ${n} пройден`,
     mains:'Сеть',mains_hint:'подать питание',helper_name:'тов. Полуэктов · научн. сотр.',helper_voice:'голос',
     gal:(n,cap)=>`Скрытый слой · что выучили ${n} нейронов`+(cap?' (показаны 50)':'')},
-  en:{title_top:'Neural Station',title_main:'«MNIST-1»',subtitle:'handwritten-digit recognition system · unit no. 784-30-10',
-    serial:'Spec 784.30.10-86 · developed at NITWiT, Solovets · unit 001 · USSR',
+  en:{title_top:'Neural Station',title_main:'«MNIST-1»',subtitle:'handwritten-digit recognition system',
+    serial:'developed at NITWiT, Solovets · unit 001 · USSR',
     foot_title:'Neuro-Station «MNIST-1» · Spec 784.30.10-86',
     foot_text:'Based on Michael Nielsen\'s book <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> and his work.',
     foot_gost:'ALDAN-3 COMPUTER',
