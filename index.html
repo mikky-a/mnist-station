@@ -445,6 +445,8 @@
   #bootbg{position:absolute;inset:0;width:100%;height:100%}
   .bvig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 32%,#040504e6 88%)}
   .bscan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#00000033 3px 4px)}
+  #bootbg,.bvig,.bscan{transition:opacity .8s}
+  body:not(.loading):not(.pretap) #bootbg,body:not(.loading):not(.pretap) .bvig,body:not(.loading):not(.pretap) .bscan{opacity:0}
   .btitle{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;max-width:520px;margin-bottom:12px}
   .btitle .bt1{font-family:var(--mono);font-size:.6rem;letter-spacing:.4em;color:#8a9491;text-shadow:0 1px 2px #000c}
   .btitle .bt2{font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif;font-weight:900;font-size:clamp(1.15rem,3.8vw,1.7rem);
@@ -776,6 +778,8 @@ const PREVIEW_B64='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   const still=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   (function loop(tm){
     if(!document.getElementById('boot'))return;          // стартовый экран снят — фон отработал
+    const bc=document.body.classList;
+    if(!bc.contains('loading')&&!bc.contains('pretap'))return;   // тумблер вышел — картотека растворяется
     x.clearRect(0,0,cv.width,cv.height);
     if(!still&&Math.random()<.2&&grid.length){const g=grid[(Math.random()*grid.length)|0];g.f=tm;g.t=tiles[(Math.random()*N)|0];}
     grid.forEach((g,i)=>{const gx=(i%cols)*54+7,gy=((i/cols)|0)*54+7;
