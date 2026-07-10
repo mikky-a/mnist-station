@@ -135,7 +135,7 @@
   #wboard.drag{cursor:grabbing}
   .bhud{position:absolute;right:9px;top:7px;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#3f7a4c;
     background:#07130ccc;padding:2px 8px;border-radius:3px;pointer-events:none}
-  .bhint{position:absolute;left:9px;bottom:7px;font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;color:#2c6e3a;pointer-events:none}
+  .bdhint{position:absolute;left:9px;bottom:7px;font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;color:#2c6e3a;pointer-events:none}
   .bzoom{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:5px;z-index:4}
   .bzoom button{width:27px;height:27px;border-radius:5px;cursor:pointer;font-family:var(--mono);font-size:.85rem;line-height:1;
     color:#12210f;background:linear-gradient(180deg,#cfd3cd,#9aa19b);border:1px solid #5c625f;
@@ -631,7 +631,7 @@
         <canvas id="wboard"></canvas>
         <div class="bzoom"><button id="bzIn" title="приблизить">+</button><button id="bzOut" title="отдалить">−</button><button id="bzFit" title="обзор всей сети">⊞</button></div>
         <div class="bhud" id="boardHud">—</div>
-        <div class="bhint" data-i18n="board_hint">ТЯНИ ДОСКУ · КОЛЕСО = ПАН</div>
+        <div class="bdhint" data-i18n="board_hint">ТЯНИ ДОСКУ · КОЛЕСО = ПАН</div>
       </div>
       <div class="crt netwrap" id="netwrap">
         <div class="netlabels"><span class="nl" data-i18n="in">ВХОД·784</span><span class="nl" id="midLabel">СКРЫТЫЙ·30</span><span class="nl" data-i18n="out">ВЫХОД·10</span></div>
