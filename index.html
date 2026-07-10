@@ -493,6 +493,7 @@
   @keyframes bloadP{50%{opacity:.35}}
   .bload.ok{color:var(--phos);animation:none;text-shadow:0 0 8px #5be07055}
   body.loading .mains{pointer-events:none;filter:brightness(.3) saturate(.5)}
+  body.loading .bplate{visibility:hidden}   /* шильдик «Сеть» — когда рубильник под напряжением */
   body.loading .bhint,body.pretap .bhint{visibility:hidden}   /* «подать питание» — только после касания */
   /* каскад: всё темно, блоки зажигаются по одному */
   body.booting .app>.top,body.booting .app>.tape,body.booting .app>.mocknote,body.booting .app .panel,body.booting .app>.footplate{
