@@ -488,7 +488,7 @@
   @keyframes bloadP{50%{opacity:.35}}
   .bload.ok{color:var(--phos);animation:none;text-shadow:0 0 8px #5be07055}
   body.loading .mains{pointer-events:none;filter:brightness(.3) saturate(.5)}
-  body.loading .bhint{visibility:hidden}
+  body.loading .bhint,body.pretap .bhint{visibility:hidden}   /* «подать питание» — только после касания */
   /* каскад: всё темно, блоки зажигаются по одному */
   body.booting .app>.top,body.booting .app>.tape,body.booting .app>.mocknote,body.booting .app .panel,body.booting .app>.footplate{
     filter:brightness(.02) saturate(.25);transition:filter .9s ease-out}
@@ -1511,11 +1511,13 @@ document.addEventListener('click',e=>{
 $('cEp').value=CFG.epochs;$('cEpV').textContent=CFG.epochs;
 buildGauge();renderFilm();buildMosaic();renderOdo();buildViz();resetTraining();
 setLang((navigator.language||'ru').toLowerCase().startsWith('ru')?'ru':'en');   // дефолт — язык браузера, переключалка работает как прежде
-document.body.classList.remove('loading');   // данные загружены и декодированы — рубильник под напряжением
+document.body.classList.remove('loading');document.body.classList.add('pretap');   // данные готовы — ждём первого касания
 {const bl=$('bload');if(bl){bl.classList.add('ok');bl.textContent=LANG==='ru'?'К ПУСКУ ГОТОВО · КОСНИТЕСЬ ЭКРАНА':'READY · TAP ANYWHERE';}}
 hWarm(['intro','start']);   // две сценарные реплики — заранее, остальное прогреется после включения
 /* интро — после первого касания: браузер даёт звук только после жеста, зато голос пойдёт синхронно с печатью */
 document.addEventListener('pointerdown',e=>{
+  const bl=$('bload');if(bl)bl.hidden=true;                    // приглашение отработало — сменяем на «подать питание»
+  document.body.classList.remove('pretap');
   if(e.target.closest&&e.target.closest('#mainsSw'))return;   // сразу дёрнул рубильник — сцена и так начинается
   setTimeout(introHelper,150);
 },{once:true});
