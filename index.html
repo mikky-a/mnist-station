@@ -495,8 +495,13 @@
   .bload{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:#8a6d1a;text-transform:uppercase;animation:bloadP 1.2s ease-in-out infinite}
   @keyframes bloadP{50%{opacity:.35}}
   .bload.ok{color:var(--phos);animation:none;text-shadow:0 0 8px #5be07055}
-  body.loading .mains{pointer-events:none;filter:brightness(.3) saturate(.5)}
-  body.loading .bplate{visibility:hidden}   /* шильдик «Сеть» — когда рубильник под напряжением */
+  /* на загрузке — только плакат и прогресс; рубильник и «Сеть» выходят по готовности */
+  .bbar{width:230px;height:7px;border-radius:4px;background:#141a16;border:1px solid #000;overflow:hidden;
+    box-shadow:inset 0 2px 4px #000c,0 1px 0 #ffffff10}
+  .bbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2c6e3a,#5be070);
+    box-shadow:0 0 8px #5be07088;transition:width .15s}
+  body.loading .mains,body.loading .bplate{display:none}
+  body:not(.loading) .btitle,body:not(.loading) .bbar{display:none}
   body.loading .bhint,body.pretap .bhint{visibility:hidden}   /* «подать питание» — только после касания */
   /* каскад: всё темно, блоки зажигаются по одному */
   body.booting .app>.top,body.booting .app>.tape,body.booting .app>.mocknote,body.booting .app .panel,body.booting .app>.footplate{
@@ -522,6 +527,7 @@
       <span class="esc"></span><span class="knob"></span><span class="jewel"></span>
     </button>
     <div class="bload" id="bload">ЗАГРУЗКА ФОНДА ДАННЫХ<span class="bdots">…</span></div>
+    <div class="bbar"><i id="bbarF"></i></div>
     <div class="bhint" data-i18n="mains_hint">подать питание</div>
   </div>
 </div>
@@ -737,10 +743,30 @@
 </div>
 
 <script src="net.browser.js"></script>
-<script src="mnist-data.js"></script>
-<script>
+<script type="module">
 'use strict';
 const $=id=>document.getElementById(id);
+/*DATA-LOADER-START*/
+/* фонд данных грузим потоком — ради настоящего процента на стартовом экране */
+const DATA_RAW=62800094;   // точный размер mnist-data.js в байтах
+await (async()=>{
+  const bl=$('bload'),bf=$('bbarF');
+  try{
+    const r=await fetch('mnist-data.js');
+    if(!r.ok||!r.body)throw 0;
+    const rd=r.body.getReader(),chunks=[];let got=0;
+    for(;;){const {done,value}=await rd.read();if(done)break;
+      chunks.push(value);got+=value.length;
+      const p=Math.min(99,(got/DATA_RAW*100)|0);
+      if(bl)bl.textContent='ЗАГРУЗКА ФОНДА ДАННЫХ · '+p+'%';
+      if(bf)bf.style.width=p+'%';}
+    const buf=new Uint8Array(got);let o=0;for(const c of chunks){buf.set(c,o);o+=c.length;}
+    (0,eval)(new TextDecoder().decode(buf));
+  }catch(e){ // file:// и браузеры без потоков — обычный script-тег, без процентов
+    await new Promise((res,rej)=>{const s=document.createElement('script');s.src='mnist-data.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+  }
+})();
+/*DATA-LOADER-END*/
 const DPR=Math.min(2,window.devicePixelRatio||1);
 function fitCanvas(c,w,h){c.width=w*DPR;c.height=h*DPR;const x=c.getContext('2d');x.setTransform(DPR,0,0,DPR,0,0);return x;}
 const CFG={hidden:30,layers:1,eta:1.0,batch:20,epochs:15};   // дефолт медленнее нильсеновского (3.0/10), чтобы рост был виден; его значения доступны ползунками
