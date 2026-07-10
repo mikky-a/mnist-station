@@ -483,6 +483,12 @@
   .mains.on .jewel{background:radial-gradient(circle at 38% 30%,#ff9a86,#e2503a 55%,#7c1408);
     box-shadow:0 0 0 3px #8f6f2e,0 0 0 4px #4d3b12,0 0 15px #e2503a99,inset 0 1px 1px #ffffff50}
   .bhint{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:#5f6a64;text-transform:uppercase}
+  /* лоадер: пока фонд данных не загружен и не декодирован — рубильник обесточен */
+  .bload{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:#8a6d1a;text-transform:uppercase;animation:bloadP 1.2s ease-in-out infinite}
+  @keyframes bloadP{50%{opacity:.35}}
+  .bload.ok{color:var(--phos);animation:none;text-shadow:0 0 8px #5be07055}
+  body.loading .mains{pointer-events:none;filter:brightness(.3) saturate(.5)}
+  body.loading .bhint{visibility:hidden}
   /* каскад: всё темно, блоки зажигаются по одному */
   body.booting .app>.top,body.booting .app>.tape,body.booting .app>.mocknote,body.booting .app .panel,body.booting .app>.footplate{
     filter:brightness(.02) saturate(.25);transition:filter .9s ease-out}
@@ -497,7 +503,7 @@
   @media(prefers-reduced-motion:reduce){.lamp.train .bulb{animation:none}.crt.warm,.nixboot{animation:none}}
 </style>
 </head>
-<body class="preboot">
+<body class="preboot loading">
 <div class="boot" id="boot">
   <div class="bootbox">
     <div class="bplate" data-i18n="mains">Сеть</div>
@@ -505,6 +511,7 @@
       <span class="m0">0</span><span class="m1">I</span>
       <span class="esc"></span><span class="knob"></span><span class="jewel"></span>
     </button>
+    <div class="bload" id="bload">ЗАГРУЗКА ФОНДА ДАННЫХ<span class="bdots">…</span></div>
     <div class="bhint" data-i18n="mains_hint">подать питание</div>
   </div>
 </div>
@@ -730,8 +737,10 @@ const S={phase:'untrained',epoch:0,loss:[],acc:[],target:0,drawn:false,recognize
 
 /* ---------- audio ---------- */
 let AC=null,muted=false,humNode=null,humGain=null,lastCfg=0;
-const ac=()=>{if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+const ac=()=>{if(AC&&AC.state==='closed')AC=null;   // после bfcache/рефреша контекст может умереть — пересоздаём
+  if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
   if(AC&&AC.state==='suspended')AC.resume();return AC;};
+window.addEventListener('pageshow',e=>{if(e.persisted){try{if(AC)AC.close();}catch(_){}AC=null;}});   // возврат из кеша — чистый старт звука
 function tone(f,d,type,v,when,f2){const c=ac();if(!c||muted)return;const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+(when||0);
   o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
   g.gain.setValueAtTime(v||.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02);}
@@ -788,6 +797,7 @@ function humGlideOff(){ // выключение «под нагрузкой»: �
   humNode=null;}
 function cfgTick(){const t=Date.now();if(t-lastCfg>70){lastCfg=t;SFX.click();}}
 document.addEventListener('pointerdown',()=>{const c=ac();if(c&&c.state==='suspended')c.resume();});
+document.addEventListener('click',()=>{const c=ac();if(c&&c.state==='suspended')c.resume();});
 
 /* ---------- localization ---------- */
 const ln=(l,v)=>(l+' ').padEnd(21,'.')+' '+v;   // строка протокола: МЕТКА ...... значение
@@ -874,7 +884,11 @@ function hSpeak(key){
   hStopVoice();if(!hVoiceOn)return;
   if(!hAudio){hAudio=new Audio();hAudio.volume=.5;}   // голос тише механики: он рядом, а не из громкоговорителя
   hAudio.src='voice/neironov_'+key+(LANG==='ru'?'':'_en')+'.mp3';
-  hAudio.play().catch(()=>hSpeakTTS((LANG==='ru'?HELP_RU:HELP_EN)[key]));
+  hAudio.play().catch(err=>{
+    if(err&&err.name==='NotAllowedError'){   // автоплей до первого клика: не подменяем роботом, доиграем по касанию
+      document.addEventListener('pointerdown',()=>{if(hVoiceOn&&hKey===key&&!$('helper').hidden)hAudio.play().catch(()=>{});},{once:true});
+    }else hSpeakTTS((LANG==='ru'?HELP_RU:HELP_EN)[key]);   // файл реально не загрузился — последний резерв
+  });
 }
 function hSpeakTTS(txt){
   const ss=window.speechSynthesis;if(!ss||!txt)return;ss.cancel();
@@ -1497,6 +1511,8 @@ document.addEventListener('click',e=>{
 $('cEp').value=CFG.epochs;$('cEpV').textContent=CFG.epochs;
 buildGauge();renderFilm();buildMosaic();renderOdo();buildViz();resetTraining();
 setLang((navigator.language||'ru').toLowerCase().startsWith('ru')?'ru':'en');   // дефолт — язык браузера, переключалка работает как прежде
+document.body.classList.remove('loading');   // данные загружены и декодированы — рубильник под напряжением
+{const bl=$('bload');if(bl){bl.classList.add('ok');bl.textContent=LANG==='ru'?'К ПУСКУ ГОТОВО':'READY TO START';}}
 setTimeout(introHelper,700);   // тов. Нейронов встречает ещё до включения станции
 </script>
 </body>
