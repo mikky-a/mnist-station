@@ -1,0 +1,1503 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>НЕЙРО-СТАНЦИЯ «МНИСТ-1»</title>
+<style>
+  :root{
+    --steel:#2b302f; --steel-hi:#3a413f; --steel-d:#202423;
+    --enamel:#38473b; --enamel-hi:#47594a; --enamel-d:#28342b;
+    --bone:#d8d1ba; --bone-d:#a69d82; --muted:#95917c; --ink:#e7e2d1;
+    --metal:#8c9491; --metal-d:#5c625f;
+    --phos:#5be070; --phos-dim:#2c6e3a; --phos-glow:#5be07066;
+    --amber:#ffb524; --nixie:#ff7d1e; --red:#e2503a; --red-glow:#e2503a55;
+    --crt:#07130c; --crt-amber:#15100a; --line:#1b231e;
+    --sans:"Helvetica Neue",-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"PT Serif","Times New Roman",serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);font-family:var(--sans);line-height:1.45;background:var(--steel);
+    background-image:repeating-linear-gradient(90deg,#ffffff05 0 1px,transparent 1px 3px),radial-gradient(circle at 50% 0%,#3a413f 0,#20242388 70%);}
+  .app{max-width:1140px;margin:0 auto;padding:18px 14px 60px}
+  .cyr{text-transform:uppercase;letter-spacing:.13em}
+  .panel{position:relative;border-radius:9px;padding:16px;background:#37453a;
+    background-image:
+      radial-gradient(circle at 11px 11px,#0008 1.7px,transparent 2.6px),
+      radial-gradient(circle at calc(100% - 11px) 11px,#0008 1.7px,transparent 2.6px),
+      radial-gradient(circle at 11px calc(100% - 11px),#0008 1.7px,transparent 2.6px),
+      radial-gradient(circle at calc(100% - 11px) calc(100% - 11px),#0008 1.7px,transparent 2.6px),
+      radial-gradient(circle at 11px 11px,#8a642a3a 3px,transparent 7px),
+      radial-gradient(circle at calc(100% - 11px) calc(100% - 11px),#8a642a30 3px,transparent 7px),
+      repeating-linear-gradient(24deg,#ffffff06 0 1px,transparent 1px 6px),
+      repeating-linear-gradient(-13deg,#00000010 0 1px,transparent 1px 11px),
+      radial-gradient(ellipse at 79% 20%,#0000002e,transparent 32%),
+      radial-gradient(ellipse at 18% 84%,#00000026,transparent 36%),
+      radial-gradient(ellipse at 62% 58%,#5c6d5022,transparent 58%),
+      radial-gradient(ellipse at 40% 30%,#26332900,#20281f66 90%),
+      linear-gradient(180deg,#ffffff0b,transparent 24%);
+    border:1px solid #232d25;
+    box-shadow:inset 0 1px 0 #ffffff12,inset 0 -7px 16px #0007,inset 0 0 46px #0004,0 3px 11px #0008;}
+  .plate{position:relative;display:inline-block;background:#c9c1a4;color:#34332a;font-weight:800;font-size:.62rem;letter-spacing:.14em;
+    text-transform:uppercase;padding:4px 22px;border-radius:3px;border:1px solid #948a6f;margin-bottom:12px;
+    background-image:radial-gradient(ellipse at 28% 40%,#00000012,transparent 55%),radial-gradient(circle at 82% 72%,#6b551f26,transparent 42%),radial-gradient(circle at 15% 85%,#0000001a,transparent 30%),linear-gradient(180deg,#ffffff28,transparent 45%,#00000014);
+    box-shadow:inset 0 1px 0 #ffffff40,inset 0 -1px 0 #0004,inset 0 0 7px #00000018,0 2px 3px #0008;
+    text-shadow:0 1px 0 #ffffff38,0 -0.5px 0 #00000030}
+  .plate::before,.plate::after{content:"";position:absolute;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;
+    background:linear-gradient(52deg,transparent 43%,#00000070 47% 53%,transparent 57%),radial-gradient(circle at 34% 28%,#f2eedd,#8a8268 58%,#453f30 100%);
+    box-shadow:inset 0 -1px 1px #0007,0 1px 1px #ffffff30}
+  .plate::before{left:6px}.plate::after{right:6px}
+  .plate.sm{font-size:.56rem;padding:3px 8px;margin-bottom:10px}
+  .plate.sm::before,.plate.sm::after{display:none}
+
+  /* заводская табличка: металл, винты, тиснение */
+  .top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-radius:8px;
+    padding:14px 30px;margin-bottom:14px;border:1px solid #171b19;
+    background-image:
+      radial-gradient(circle at 13px 13px,#dfe3dd 1.2px,#4d5450 2px,#20242388 2.8px,transparent 3.6px),
+      radial-gradient(circle at calc(100% - 13px) 13px,#dfe3dd 1.2px,#4d5450 2px,#20242388 2.8px,transparent 3.6px),
+      radial-gradient(circle at 13px calc(100% - 13px),#dfe3dd 1.2px,#4d5450 2px,#20242388 2.8px,transparent 3.6px),
+      radial-gradient(circle at calc(100% - 13px) calc(100% - 13px),#dfe3dd 1.2px,#4d5450 2px,#20242388 2.8px,transparent 3.6px),
+      repeating-linear-gradient(90deg,#ffffff06 0 1px,transparent 1px 3px),
+      repeating-linear-gradient(0deg,#00000008 0 1px,transparent 1px 5px),
+      radial-gradient(ellipse at 75% 8%,#ffffff0d,transparent 55%),
+      radial-gradient(ellipse at 20% 90%,#00000042,transparent 50%),
+      linear-gradient(180deg,#3a4340,#252b28 55%,#2f3532);
+    box-shadow:inset 0 1px 0 #ffffff1c,inset 0 -2px 6px #0008,inset 0 0 48px #0003,0 3px 10px #0008;}
+  .brand{display:flex;align-items:center;gap:18px}
+  .emblem{width:66px;height:66px;flex:none;filter:drop-shadow(0 1px 1px #000c) drop-shadow(0 4px 6px #0008)}
+  /* водяной знак завода на протоколе */
+  .pwm{position:absolute;left:50%;top:52%;width:132px;height:132px;transform:translate(-50%,-50%) rotate(-9deg);
+    opacity:.085;pointer-events:none}
+  .brand h1{margin:0;line-height:1.02;text-transform:uppercase;font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif}
+  .brand h1 .t1{display:block;font-size:.72rem;font-weight:700;letter-spacing:.42em;color:#98a09a;
+    text-shadow:0 1px 0 #ffffff1a,0 -1px 1px #000c}
+  .brand h1 .t2{display:block;font-size:clamp(1.5rem,4.2vw,2.15rem);font-weight:900;letter-spacing:.14em;color:#c3c9c1;
+    text-shadow:0 1px 0 #ffffff2c,0 2px 2px #0009,0 -1px 1px #000a}
+  .brand small{display:block;font-size:.56rem;color:#7d857f;letter-spacing:.2em;font-weight:600;margin-top:5px;text-transform:uppercase;
+    border-top:1px solid #00000055;box-shadow:0 -1px 0 #ffffff12;padding-top:5px;text-shadow:0 -1px 0 #000b}
+  .serial{font-family:var(--mono);font-size:.6rem;color:#8f978f;letter-spacing:.12em;text-shadow:0 -1px 0 #000b,0 1px 0 #ffffff12;
+    max-width:340px;text-align:right;line-height:1.6}
+  .muteb{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#12210f;cursor:pointer;
+    padding:6px 11px;border-radius:5px;background:linear-gradient(180deg,#cfd3cd,#9aa19b);border:1px solid #5c625f;
+    box-shadow:inset 0 1px 0 #ffffffaa,0 2px 0 #565b56,0 3px 5px #0006}
+  .muteb:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #ffffffaa,0 1px 0 #565b56}
+  .muteb.off{color:#7a7f7a;filter:grayscale(.6) brightness(.85)}
+  .lamp{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;color:var(--muted)}
+  .bulb{width:16px;height:16px;border-radius:50%;border:2px solid #0007;background:#3a2a12;box-shadow:inset 0 0 4px #000}
+  .lamp.wait .bulb{background:#5a4210;box-shadow:inset 0 0 4px #000,0 0 6px #ffb52444}
+  .lamp.train .bulb{background:var(--red);box-shadow:0 0 10px var(--red);animation:blink .7s steps(2) infinite}
+  .lamp.done .bulb{background:var(--phos);box-shadow:0 0 12px var(--phos)}
+  .lamp.train span,.lamp.done span{color:var(--ink)}
+  @keyframes blink{50%{opacity:.25}}
+  .mocknote{font-family:var(--mono);font-size:.66rem;color:var(--bone-d);letter-spacing:.05em;border:1px dashed var(--metal-d);
+    border-radius:6px;padding:7px 12px;margin-bottom:14px;background:repeating-linear-gradient(45deg,#ffb52412 0 8px,transparent 8px 16px)}
+  .mocknote b{color:var(--amber)}
+
+  .crt{position:relative;border-radius:8px;overflow:hidden;background:var(--crt);
+    box-shadow:inset 0 0 0 3px #0b0f0c,inset 0 0 34px #000d,0 0 0 2px #0006;outline:6px solid var(--enamel-d);outline-offset:-9px}
+  .crt::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:repeating-linear-gradient(0deg,#0000 0 2px,#0000000f 2px 3px),radial-gradient(ellipse at center,transparent 55%,#000a 100%)}
+  .crt::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:4;border-radius:inherit;   /* стекло: косой блик */
+    background:linear-gradient(112deg,#ffffff16 0%,#ffffff07 14%,transparent 26%),radial-gradient(ellipse at 16% 6%,#ffffff12,transparent 38%)}
+  .crt.amber{background:var(--crt-amber)}
+
+  .stage{display:grid;grid-template-columns:210px 1fr 196px;gap:14px}
+  @media(max-width:920px){.stage{grid-template-columns:1fr}}
+  #pad{width:100%;aspect-ratio:1;display:block;cursor:crosshair;touch-action:none;position:relative;z-index:1}
+  .padbtns{display:flex;gap:9px;margin-top:12px}
+  .cbtn{flex:1;font-family:var(--sans);font-weight:800;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:10px 6px;
+    border-radius:6px;cursor:pointer;color:#20241f;background:linear-gradient(180deg,#cfd3cd,#9aa19b);border:1px solid #6b716c;
+    box-shadow:inset 0 1px 0 #ffffffaa,0 3px 0 #565b56,0 4px 6px #0006}
+  .cbtn:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #ffffffaa,0 1px 0 #565b56}
+  .padhint{font-family:var(--serif);font-size:.76rem;line-height:1.5;color:#b8b096;margin-top:11px;letter-spacing:.005em}
+
+  .netpanel{padding:14px}
+  .netwrap{position:relative}
+  #net{width:100%;display:block;position:relative;z-index:1}
+  .netlabels{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:space-between;padding:0 14px;pointer-events:none;z-index:4}
+  .nl{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;color:var(--phos-dim)}
+  .legend{position:absolute;bottom:8px;left:12px;display:flex;gap:14px;font-family:var(--mono);font-size:.6rem;color:var(--muted);z-index:4}
+  .legend i{font-style:normal;display:flex;gap:5px;align-items:center}
+  /* тумблер вида: схема ⇄ доска чисел */
+  .vtoggle{display:inline-flex;align-items:center;gap:7px;margin-left:12px;vertical-align:middle}
+  .vtoggle .vt{font-family:var(--mono);font-size:.54rem;letter-spacing:.13em;color:#95917c;text-transform:uppercase}
+  .vtoggle .vt.on{color:var(--amber);text-shadow:0 0 6px #ffb52466}
+  .vtsw{width:40px;height:20px;border-radius:10px;background:#1d2420;border:1px solid #10140f;cursor:pointer;position:relative;
+    box-shadow:inset 0 2px 4px #000a;padding:0}
+  .vtsw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;transition:left .14s;
+    background:radial-gradient(circle at 35% 30%,#e8e2ce,#8f8a76 65%,#5c584a);box-shadow:0 1px 3px #000b}
+  .vtsw.r::after{left:22px}
+  /* доска чисел */
+  .boardwrap{position:relative}
+  #wboard{width:100%;height:432px;display:block;cursor:grab;touch-action:none}
+  #wboard.drag{cursor:grabbing}
+  .bhud{position:absolute;right:9px;top:7px;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#3f7a4c;
+    background:#07130ccc;padding:2px 8px;border-radius:3px;pointer-events:none}
+  .bhint{position:absolute;left:9px;bottom:7px;font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;color:#2c6e3a;pointer-events:none}
+  .bzoom{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:5px;z-index:4}
+  .bzoom button{width:27px;height:27px;border-radius:5px;cursor:pointer;font-family:var(--mono);font-size:.85rem;line-height:1;
+    color:#12210f;background:linear-gradient(180deg,#cfd3cd,#9aa19b);border:1px solid #5c625f;
+    box-shadow:inset 0 1px 0 #ffffff66,0 2px 3px #0009}
+  .bzoom button:active{transform:translateY(1px);box-shadow:inset 0 1px 3px #0006}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .nowlearn{position:absolute;bottom:7px;right:12px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.6rem;color:var(--muted);z-index:4}
+  #exThumb{width:26px;height:26px;border-radius:3px;display:block;border:1px solid var(--phos-dim)}
+
+  .obars{display:flex;flex-direction:column;gap:5px}
+  .ob{display:grid;grid-template-columns:14px 1fr 34px;gap:6px;align-items:center;font-family:var(--mono);font-size:.72rem}
+  .ob .d{color:var(--bone-d);text-align:center}
+  .ob .track{height:15px;background:#0b0f0c;border-radius:3px;overflow:hidden;border:1px solid #000;box-shadow:inset 0 1px 2px #000}
+  .ob .track i{display:block;height:100%;width:10%;background:linear-gradient(180deg,var(--phos),var(--phos-dim));box-shadow:0 0 6px var(--phos-glow);transition:width .35s}
+  .ob .pv{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;font-size:.66rem}
+  .ob.win .d{color:var(--amber);font-weight:800}
+  .ob.win .track i{background:linear-gradient(180deg,var(--amber),#9a6b10);box-shadow:0 0 8px var(--amber)}
+  .ob.win .pv{color:var(--amber)}
+  .guess{margin-top:12px;text-align:center;border-top:1px solid var(--enamel-d);padding-top:11px}
+  .guess .lbl{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+  .nixie{position:relative;display:inline-block;margin-top:6px;min-width:56px;padding:6px 14px;border-radius:10px 10px 6px 6px;
+    background:#160c04;border:1px solid #3a2810;
+    box-shadow:inset 0 0 10px #000,inset 0 0 4px #ff7d1e22,inset 0 2px 3px #ffffff0d;font-family:var(--mono);font-size:2.6rem;font-weight:700;line-height:1;color:var(--nixie);
+    text-shadow:0 0 8px var(--nixie),0 0 16px #ff7d1e88}
+  .nixie::after,.nx::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;   /* анодная сетка + стекло колбы */
+    background:repeating-linear-gradient(0deg,transparent 0 2px,#00000026 2px 3px),
+      repeating-linear-gradient(90deg,transparent 0 2px,#0000001c 2px 3px),
+      linear-gradient(105deg,#ffffff1e 2%,#ffffff05 12%,transparent 24%),
+      radial-gradient(ellipse at 50% -8%,#ffffff14,transparent 42%)}
+  .guess.unsure .nixie{color:#5a4520;text-shadow:none}
+
+  .bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:920px){.bottom{grid-template-columns:1fr}}
+  .ctrls{display:flex;flex-direction:column;gap:10px}
+  /* клавиши в утопленных гнёздах; гравировка + патина, у каждой свой износ */
+  .sock{display:block;padding:7px;border-radius:9px;background:#222b24;
+    box-shadow:inset 0 2px 6px #000c,inset 0 -1px 0 #ffffff18,0 1px 0 #ffffff12}
+  .bigbtn{position:relative;display:block;width:100%;font-family:var(--sans);font-weight:800;font-size:.75rem;letter-spacing:.11em;text-transform:uppercase;
+    padding:13px 12px;border-radius:5px;cursor:pointer;
+    color:#173119;text-shadow:0 1px 0 #ffffff52,0 -1px 1px #00000055;   /* гравировка: краска ушла, остался рельеф */
+    border:1px solid #14241a;
+    box-shadow:0 4px 0 #14301c,0 5px 4px #000a,inset 0 1px 0 #ffffff5c,inset 0 -3px 5px #0006,inset 0 0 8px #241a0822}
+  .bigbtn::before{margin-right:7px}
+  .bigbtn.w1::before{content:"▶︎"}
+  .bigbtn.w2::before{content:"▶︎▶︎"}
+  .bigbtn.red::before{content:"⟲"}
+  .bigbtn:active{transform:translateY(4px);box-shadow:0 0 0 #14301c,inset 0 2px 6px #0007,inset 0 0 8px #241a0822}
+  .bigbtn:disabled{filter:grayscale(.6) brightness(.7);cursor:not-allowed;transform:none}
+  /* w1 «Цикл ×1»: жмут иногда — редкие царапины, точка грязи у правого угла */
+  .bigbtn.w1{background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='4'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.3'/></svg>"),
+      repeating-linear-gradient(23deg,#ffffff07 0 1px,transparent 1px 9px),
+      radial-gradient(circle at 31% 68%,#ffffff10 0 5%,transparent 20%),
+      radial-gradient(circle at 87% 24%,#1d130640 0 2%,transparent 13%),
+      linear-gradient(180deg,#8a642a17,#8a642a08 60%,#8a642a1c),
+      radial-gradient(ellipse 90% 50% at 50% 8%,#ffffff59,transparent 60%),
+      linear-gradient(180deg,#7cb884 0%,#4c8f5e 55%,#33653f 100%);
+    background-blend-mode:overlay,normal,normal,normal,normal,normal,normal}
+  /* w2 «Все эпохи»: рабочая — затёрта до блеска, крест царапин, лак стёрт */
+  .bigbtn.w2{background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='11'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.34'/></svg>"),
+      repeating-linear-gradient(9deg,#ffffff08 0 1px,transparent 1px 8px),
+      repeating-linear-gradient(78deg,#0000000a 0 1px,transparent 1px 12px),
+      radial-gradient(ellipse 55% 45% at 48% 34%,#ffffff1e 0 8%,transparent 42%),
+      radial-gradient(circle at 9% 86%,#1d13063e 0 2%,transparent 12%),
+      radial-gradient(circle at 91% 74%,#1d130630 0 1.5%,transparent 10%),
+      linear-gradient(180deg,#8a642a12,#8a642a06 60%,#8a642a17),
+      radial-gradient(ellipse 90% 50% at 50% 8%,#ffffff59,transparent 60%),
+      linear-gradient(180deg,#7cb884 0%,#4c8f5e 55%,#33653f 100%);
+    background-blend-mode:overlay,normal,normal,normal,normal,normal,normal,normal,normal}
+  /* защитная крышка сброса */
+  .guard{position:relative;display:block;padding:7px;border-radius:9px;background:#222b24;
+    box-shadow:inset 0 2px 6px #000c,0 1px 0 #ffffff12;perspective:300px}
+  .cover{position:absolute;inset:0;border-radius:9px;transform-origin:50% 0;transition:transform .35s cubic-bezier(.34,1.4,.64,1);
+    background:linear-gradient(180deg,#ffb52426,#ffb5240f 60%),linear-gradient(180deg,#d9c98e33,#00000022);
+    border:2px solid #b3a06a;box-shadow:inset 0 1px 0 #ffffff55,0 2px 5px #0007;cursor:pointer}
+  .cover::after{content:"";position:absolute;left:50%;bottom:4px;width:26px;height:5px;margin-left:-13px;border-radius:2px;
+    background:#b3a06a;box-shadow:inset 0 1px 0 #ffffff66}
+  .guard.open .cover{transform:rotateX(-108deg)}
+  @media(prefers-reduced-motion:reduce){.cover{transition:opacity .2s}.guard.open .cover{opacity:0;pointer-events:none;transform:none}}
+  /* w3 «Сброс»: под крышкой — царапин нет, лак пожелтел, пыль по нижней кромке */
+  .bigbtn.red{color:#38100a;text-shadow:0 1px 0 #ffffff45,0 -1px 1px #00000060;border-color:#2a0f08;
+    box-shadow:0 4px 0 #3a120a,0 5px 4px #000a,inset 0 1px 0 #ffffff5c,inset 0 -3px 5px #0006,inset 0 0 8px #241a0822;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='9'/><feColorMatrix type='saturate' values='0'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.3'/></svg>"),
+      repeating-linear-gradient(31deg,#ffffff06 0 1px,transparent 1px 13px),
+      radial-gradient(circle at 16% 20%,#1d130638 0 2%,transparent 12%),
+      linear-gradient(0deg,#1d130622,transparent 24%),
+      linear-gradient(180deg,#8a642a22,#8a642a0c 55%,#8a642a28),
+      radial-gradient(ellipse 90% 50% at 50% 8%,#ffffff50,transparent 60%),
+      linear-gradient(180deg,#d48375 0%,#b04c3a 55%,#88301f 100%);
+    background-blend-mode:overlay,normal,normal,normal,normal,normal,normal}
+  .bigbtn.red:active{box-shadow:0 0 0 #3a120a,inset 0 2px 6px #0007,inset 0 0 8px #241a0822}
+  .cap{font-family:var(--serif);font-size:.74rem;line-height:1.5;color:#c1b99e;letter-spacing:.005em;
+    margin-top:9px;border-top:1px solid #2a352c;padding-top:8px}
+  .cap b{color:#ddd5b8;font-weight:700}
+  .nixierow{display:flex;gap:8px;margin-top:2px}
+  .nx{position:relative;flex:1;background:#160c04;border:1px solid #3a2810;border-radius:8px 8px 5px 5px;padding:8px 6px;text-align:center;
+    box-shadow:inset 0 0 10px #000,inset 0 2px 3px #ffffff0d}
+  .nx .v{font-family:var(--mono);font-size:1.15rem;font-weight:700;color:var(--nixie);text-shadow:0 0 6px var(--nixie),0 0 12px #ff7d1e66;font-variant-numeric:tabular-nums}
+  .nx .k{font-size:.52rem;color:var(--bone-d);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+  .epwrap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.66rem;color:var(--muted);letter-spacing:.05em}
+  .epwrap b{color:var(--nixie)}
+  .chartcard svg{width:100%;height:auto;display:block;position:relative;z-index:1}
+  .ctitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .ctitle .plate.sm{margin-bottom:0}
+  .ctitle .hbtn{top:0}
+  .ctitle .tr{font-family:var(--mono);font-size:.56rem;letter-spacing:.06em}
+
+  /* config controls */
+  .cfgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  @media(max-width:820px){.cfgrid{grid-template-columns:repeat(2,1fr)}}
+  .cfg{display:flex;flex-direction:column;gap:8px}
+  .cfg .lab{font-family:var(--mono);font-size:.56rem;letter-spacing:.09em;color:var(--bone-d);text-transform:uppercase;display:flex;justify-content:space-between;align-items:baseline}
+  .cfg .lab b{color:var(--nixie);font-size:.95rem;text-shadow:0 0 5px #ff7d1e66;font-variant-numeric:tabular-nums;flex:none;padding-left:8px}
+  input[type=range].pot{-webkit-appearance:none;appearance:none;width:100%;height:9px;border-radius:5px;
+    background:repeating-linear-gradient(90deg,#c9c1a428 0 1px,transparent 1px 10%),linear-gradient(180deg,#1a201b,#0b0f0c);   /* риски-деления */
+    border:1px solid #000;box-shadow:inset 0 1px 3px #000,0 1px 0 #ffffff10;outline:none;cursor:pointer}
+  input[type=range].pot.danger{background:linear-gradient(90deg,#1a201b 0 72%,#4a1a12 82% 100%);border:1px solid #000;box-shadow:inset 0 1px 3px #000}
+  input[type=range].pot::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:26px;border-radius:4px;
+    background:linear-gradient(180deg,#dfe3dd,#8a918b);border:1px solid #4c524e;box-shadow:inset 0 1px 0 #fff,inset 0 -2px 2px #0005,0 2px 3px #0008;cursor:pointer}
+  input[type=range].pot::-moz-range-thumb{width:18px;height:26px;border-radius:4px;background:linear-gradient(180deg,#dfe3dd,#8a918b);border:1px solid #4c524e;box-shadow:inset 0 1px 0 #fff;cursor:pointer}
+  .seg{display:flex;border:1px solid #4c524e;border-radius:6px;overflow:hidden;box-shadow:inset 0 1px 0 #ffffff10,0 2px 4px #0006}
+  .seg button{flex:1;background:linear-gradient(180deg,#3a413f,#2a302c);color:var(--muted);border:none;border-right:1px solid #1a1e1c;
+    padding:9px 0;font-family:var(--mono);font-weight:800;font-size:.9rem;cursor:pointer}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:linear-gradient(180deg,var(--amber),#9a6b10);color:#1a1206;text-shadow:0 0 4px #ffb52488}
+
+  .tiles{display:grid;grid-template-columns:repeat(15,1fr);gap:5px}
+  @media(max-width:700px){.tiles{grid-template-columns:repeat(10,1fr)}}
+  .tiles canvas{width:100%;aspect-ratio:1;border-radius:3px;border:1px solid var(--phos-dim);display:block;image-rendering:pixelated;background:#0b0f0c}
+
+  /* предупредительная лента */
+  .tape{height:7px;border-radius:2px;margin:0 2px 12px;
+    background:repeating-linear-gradient(-45deg,#c8a01f 0 14px,#1c1b16 14px 28px);
+    box-shadow:inset 0 1px 0 #ffffff22,inset 0 -2px 3px #0008,0 1px 3px #0006;opacity:.85}
+  /* вентиляционная решётка */
+  .vent{width:64px;height:30px;border-radius:4px;background:#1a1e1c;
+    background-image:repeating-linear-gradient(0deg,#000 0 2px,#31363320 2px 3px,#000 3px 5px);
+    box-shadow:inset 0 1px 3px #000,inset 0 0 8px #000,0 1px 0 #ffffff10;border:1px solid #14181660}
+  /* nixie в заголовке графика */
+  .nx.inl{flex:none;padding:3px 9px;min-width:52px;margin-bottom:10px}
+  .nx.inl .v{font-size:1rem}
+  /* стрелочный прибор */
+  .accrow{display:flex;justify-content:center}
+  .gaugebox{position:relative;flex:none;width:100%;max-width:250px;padding:6px 0;background:#d6cfae;border-radius:6px;border:1px solid #948a6f;
+    background-image:radial-gradient(ellipse at 30% 25%,#fff3 0,transparent 60%),radial-gradient(circle at 80% 80%,#6b551f22,transparent 50%);
+    box-shadow:inset 0 0 8px #00000030,inset 0 -2px 4px #0002,0 2px 5px #0007;display:flex;align-items:center;justify-content:center}
+  .gaugebox::after{content:"";position:absolute;inset:3px;border-radius:4px;pointer-events:none;   /* стекло прибора */
+    background:linear-gradient(118deg,#ffffff42 0%,#ffffff10 22%,transparent 38%),radial-gradient(ellipse at 78% 88%,#00000014,transparent 50%);
+    box-shadow:inset 0 0 3px #ffffff30}
+  .gaugebox svg{width:206px;max-width:88%;height:auto;display:block}
+  .accrow .crt{flex:1;min-width:0}
+  /* киноплёнка образцов */
+  .film{background:#0d0f0d;border-radius:5px;border:1px solid #000;box-shadow:inset 0 0 8px #000,inset 0 1px 0 #ffffff08;padding:10px 4px;
+    background-image:                                              /* перфорация киноплёнки */
+      radial-gradient(circle,#33403466 1.6px,transparent 2.2px),
+      radial-gradient(circle,#33403466 1.6px,transparent 2.2px);
+    background-position:4px 3px,4px calc(100% - 8px);background-size:12px 6px;background-repeat:repeat-x}
+  .film canvas{width:100%;display:block;image-rendering:pixelated}
+  /* фонд данных: мозаика + одометр */
+  .fundgrid{display:grid;grid-template-columns:290px 1fr;gap:18px;align-items:start}
+  @media(max-width:820px){.fundgrid{grid-template-columns:1fr}}
+  .mosaicbox{background:#0a0c0a;border:1px solid #000;border-radius:5px;box-shadow:inset 0 0 10px #000;padding:6px}
+  #mosaic{width:100%;height:72px;display:block;image-rendering:pixelated}
+  .odo{display:flex;align-items:center;gap:12px;margin-top:9px;flex-wrap:wrap}
+  .odo .olbl{font-family:var(--mono);font-size:.56rem;letter-spacing:.12em;color:var(--bone-d);text-transform:uppercase}
+  .ododig{display:flex;gap:2px;background:#141210;border:1px solid #3a3628;border-radius:4px;padding:4px 6px;box-shadow:inset 0 0 8px #000,0 1px 0 #ffffff10}
+  .ododig span{display:inline-block;width:15px;text-align:center;font-family:var(--mono);font-weight:700;font-size:.95rem;color:#e8e2cf;
+    background:linear-gradient(180deg,#050403 0%,#221f19 22%,#37322a 50%,#221f19 78%,#050403 100%);   /* барабан-цилиндр */
+    border-radius:2px;box-shadow:inset 0 1px 2px #000,inset 0 -1px 1px #000,inset 1px 0 0 #ffffff08;text-shadow:0 1px 1px #000}
+  .ododig span.last{color:var(--amber)}
+  /* отметка верно/неверно при ленте */
+  /* протокол испытаний: бумага АЦПУ из щели под экраном */
+  .paper{position:absolute;left:50%;bottom:0;transform:translate(-50%,105%);width:262px;z-index:6;
+    background:#e9e2c9;color:#2e2b20;font-family:var(--mono);font-size:.62rem;letter-spacing:.03em;
+    padding:12px 26px 40px;border-radius:3px 3px 0 0;
+    background-image:
+      radial-gradient(circle,#00000042 2.1px,transparent 2.8px),
+      radial-gradient(circle,#00000042 2.1px,transparent 2.8px),
+      repeating-linear-gradient(0deg,transparent 0 15px,#00000008 15px 16px),
+      radial-gradient(ellipse at 60% 20%,#fff5 0,transparent 60%),
+      linear-gradient(90deg,#00000014 0 18px,transparent 18px calc(100% - 18px),#00000014 calc(100% - 18px));
+    background-repeat:repeat-y,repeat-y,repeat,no-repeat,no-repeat;
+    background-position:left 7px top 9px,right 7px top 9px,0 0,0 0,0 0;
+    background-size:14px 15px,14px 15px,auto,auto,auto;
+    box-shadow:0 -5px 16px #000b,inset 0 0 22px #6b551f14;
+    transition:transform .9s cubic-bezier(.25,.9,.3,1);pointer-events:none}
+  .paper.up{transform:translate(-50%,2%)}
+  .pline{white-space:pre;line-height:1.75;visibility:hidden}
+  .pline.on{visibility:visible}
+  .pline.hdr{text-align:center;font-weight:800;letter-spacing:.08em}
+  .pline.verd{font-weight:800}
+  .pstamp{position:absolute;right:22px;bottom:8px;transform:rotate(-13deg) scale(2.6);opacity:0;
+    border:3px double #b3362a;color:#b3362a;border-radius:7px;padding:5px 12px;font-weight:800;
+    text-align:center;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+    background:radial-gradient(ellipse at 40% 40%,#b3362a12,#b3362a04);
+    text-shadow:0 0 1px #b3362a44}
+  .pstamp.slam{animation:slam .32s cubic-bezier(.2,1.6,.4,1) forwards}
+  @keyframes slam{to{opacity:.88;transform:rotate(-13deg) scale(1)}}
+  .shake{animation:shakeP .28s}
+  @keyframes shakeP{20%{transform:translate(2px,1px)}45%{transform:translate(-2px,-2px)}70%{transform:translate(1px,-1px)}}
+  /* отбивка за пройденный этап (ручной цикл) */
+  /* табельная карта этапа: выезжает из щели, компостер пробивает дырку, штамп */
+  .tcard{position:fixed;left:50%;bottom:18px;z-index:95;width:256px;margin-left:-128px;pointer-events:none;
+    background:
+      repeating-linear-gradient(0deg,transparent 0 9px,#4a3f2210 9px 10px),
+      linear-gradient(180deg,#d9c893,#c9b67c 70%,#d2c08a);
+    border:1px solid #8a7847;border-radius:4px 14px 4px 4px;padding:12px 14px 14px;
+    color:#4a3f22;font-family:var(--mono);
+    box-shadow:inset 0 1px 0 #ffffff66,inset 0 0 12px #8a642a22,0 8px 20px #000b;
+    transform:translateY(150%) rotate(.5deg);opacity:0}
+  .tcard.up{transition:transform .42s cubic-bezier(.25,1.25,.4,1),opacity .2s;transform:translateY(0) rotate(.5deg);opacity:1}
+  .tcard.jolt{animation:tjolt .2s ease-out}
+  @keyframes tjolt{30%{transform:translateY(8px) rotate(1.6deg)}}
+  .tcard.away{transition:transform .5s ease-in,opacity .4s;transform:translateY(160%) rotate(4deg);opacity:0}
+  .tch{font-size:.56rem;letter-spacing:.18em;font-weight:700;border-bottom:1px solid #8a7847;padding-bottom:4px;margin-bottom:7px}
+  .tcb{font-size:.82rem;font-weight:700;letter-spacing:.1em}
+  .tca{font-size:.62rem;letter-spacing:.08em;margin-top:2px;color:#6b5b2e}
+  .tholes{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .tholes i{width:13px;height:13px;border-radius:50%;border:1.5px dashed #8a7847}
+  .tholes i.hit{border-style:solid;background:radial-gradient(circle at 42% 38%,#2b2416,#000 72%);
+    box-shadow:inset 0 1.5px 2px #00000088,0 0 0 1.5px #6d5c2b}
+  .tstamp{position:absolute;right:8px;top:32px;transform:rotate(-14deg) scale(2.2);opacity:0;
+    color:#a03626;border:2.5px solid #a03626;border-radius:5px;padding:2px 9px;
+    font-weight:800;font-size:.72rem;letter-spacing:.14em;mix-blend-mode:multiply}
+  .tcard.stamped .tstamp{transition:transform .12s cubic-bezier(.6,0,1,1),opacity .1s;transform:rotate(-14deg) scale(1);opacity:.92}
+  @media(prefers-reduced-motion:reduce){.tcard,.tcard.up,.tcard.away{transition:opacity .25s;transform:none}.tcard.jolt{animation:none}}
+  /* приглашение к испытанию */
+  .invite{animation:invitePulse 1.5s ease-in-out infinite}
+  @keyframes invitePulse{0%,100%{box-shadow:inset 0 1px 0 #ffffff12,inset 0 -7px 16px #0007,inset 0 0 46px #0004,0 3px 11px #0008}
+    50%{box-shadow:inset 0 1px 0 #ffffff12,inset 0 -7px 16px #0007,inset 0 0 46px #0004,0 3px 11px #0008,0 0 16px #5be07059,0 0 0 2px #5be07048}}
+  @media(prefers-reduced-motion:reduce){.invite{animation:none}.stamp.in{animation:none;opacity:.9}}
+  .gmark{font-family:var(--mono);font-size:.9rem;font-weight:800;margin-left:8px;vertical-align:middle}
+  .gmark.ok{color:var(--phos);text-shadow:0 0 6px var(--phos)}
+  .gmark.no{color:var(--red);text-shadow:0 0 6px var(--red)}
+  .cbtn:disabled{filter:grayscale(.7) brightness(.75);cursor:not-allowed;transform:none}
+  /* ═══ помощник — тов. Нейронов ═══ */
+  .hbtn{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;position:relative;top:-1px;
+    margin-left:7px;width:19px;height:19px;border-radius:50%;flex:none;
+    border:1px solid #6b7570;color:#1a1206;font-weight:800;font-size:.72rem;line-height:1;cursor:pointer;font-family:var(--serif);
+    background:radial-gradient(circle at 35% 28%,#f2eedd,#c9a23a 70%,#8a6d1a);
+    box-shadow:inset 0 1px 0 #ffffffcc,0 1px 2px #0009;text-shadow:0 1px 0 #ffffff40}
+  .hbtn:hover{background:radial-gradient(circle at 35% 28%,#fff,#e6b83a);box-shadow:inset 0 1px 0 #fff,0 0 8px #ffb52488,0 1px 2px #0009}
+  .hbtn:active{transform:translateY(1px)}
+  .plwrap{display:inline-flex;align-items:center;max-width:100%;vertical-align:top;margin-bottom:12px}
+  .plwrap .plate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;margin-bottom:0}
+  .helper{position:fixed;left:16px;bottom:16px;z-index:130;width:min(432px,calc(100vw - 32px));display:flex;
+    border-radius:11px;overflow:hidden;border:1px solid #6f6549;
+    background:
+      repeating-linear-gradient(0deg,#00000006 0 1px,transparent 1px 3px),
+      radial-gradient(ellipse at 80% 110%,#8a642a22,transparent 55%),
+      linear-gradient(180deg,#e6debf,#d3caa8 60%,#dbd2b2);
+    box-shadow:0 0 0 3px #00000055,0 20px 46px -14px #000e,inset 0 1px 0 #ffffffaa,inset 0 -1px 0 #00000022;
+    transform:translateY(150%);opacity:0;transition:transform .55s cubic-bezier(.2,.95,.3,1),opacity .3s}
+  .helper.up{transform:translateY(0);opacity:1}
+  .hportr{position:relative;flex:none;width:110px;background:var(--crt);overflow:hidden;border-right:1px solid #0b0f0c}
+  .hportr img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;filter:contrast(1.04) saturate(.96)}
+  .hportr::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,#0000 0 2px,#00000026 2px 3px),linear-gradient(108deg,#ffffff1c,transparent 32%),radial-gradient(ellipse at 50% 120%,#000a,transparent 55%)}
+  .hbody{flex:1;min-width:0;padding:11px 13px 13px;display:flex;flex-direction:column}
+  .hname{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+  .hname b{font-family:var(--mono);font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;color:#8a2f1e;text-shadow:0 1px 0 #ffffff55}
+  .hctl{display:flex;gap:6px;align-items:center}
+  .hvoice{background:#c4ba94;border:1px solid #8f8568;color:#3a3427;border-radius:6px;padding:3px 8px;
+    font-family:var(--mono);font-size:.54rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff66,0 1px 1px #00000033}
+  .hvoice.off{opacity:.5;filter:grayscale(.6)}
+  .hx{cursor:pointer;background:none;border:none;color:#6b6350;font-size:1rem;line-height:1;padding:2px 3px}
+  .hx:hover{color:#e2503a}
+  /* тетрадный лист в линейку: строки едут вместе с текстом (attachment:local) */
+  .htext{font-family:"Courier New",Courier,monospace;font-weight:700;font-size:.8rem;letter-spacing:-.01em;line-height:21px;color:#26231a;
+    height:132px;overflow-y:auto;cursor:pointer;
+    padding:2px 10px 4px 10px;border:1px solid #b3a884;border-radius:3px;
+    background:
+      repeating-linear-gradient(180deg,transparent 0 20px,#7d9ec43d 20px 21px),
+      linear-gradient(180deg,#f4eed6,#ebe3c6);
+    background-attachment:local,local;
+    box-shadow:inset 0 1px 3px #00000026}
+  @media(max-width:560px){.htext{height:158px}}
+  .htext .car{color:#a03626;animation:carB .7s step-end infinite}
+  @keyframes carB{50%{opacity:0}}
+  @media(max-width:560px){.helper{left:8px;right:8px;width:auto}}
+  @media(prefers-reduced-motion:reduce){.helper{transition:opacity .2s}.htext .car{animation:none}}
+
+  /* ═══ включение станции ═══ */
+  /* заводской шильдик-сноска: штампованная латунь на заклёпках */
+  .footplate{max-width:640px;margin:26px auto 0;position:relative;text-align:center;
+    background:linear-gradient(160deg,#a7a292,#8d8878 55%,#9b9684);
+    border:1px solid #55513f;border-radius:5px;padding:13px 44px;
+    box-shadow:inset 0 1px 0 #ffffff55,inset 0 -1px 0 #00000044,inset 0 0 14px #00000022,0 4px 9px #0008;
+    color:#3b382c;text-shadow:0 1px 0 #ffffff40}
+  .footplate .riv{position:absolute;top:50%;margin-top:-6px;width:12px;height:12px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#d9d4c2,#7d7866 60%,#4c483a);box-shadow:0 1px 2px #0009,inset 0 1px 1px #ffffffaa}
+  .footplate .riv.l{left:12px}.footplate .riv.r{right:12px}
+  .footplate h3{margin:0 0 2px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase}
+  .footplate p{margin:0;font-family:var(--serif);font-size:.72rem;line-height:1.5}
+  .footplate a{color:#5c2317;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+  .footplate .gost{margin-top:5px;font-family:var(--mono);font-size:.56rem;letter-spacing:.14em;color:#55513f}
+  body.preboot .app{visibility:hidden}
+  .boot{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;
+    background:#060807 radial-gradient(circle at 50% 44%,#131a15 0,#040504 72%);transition:opacity 1.7s ease-in}
+  .boot.off{opacity:0;pointer-events:none}
+  .bootbox{display:flex;flex-direction:column;align-items:center;gap:16px}
+  .bplate{background:#c9c1a4;color:#34332a;font-weight:800;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
+    padding:5px 16px;border-radius:3px;border:1px solid #948a6f;box-shadow:inset 0 -1px 0 #0003,0 1px 3px #000c}
+  /* пакетный поворотный рубильник: эмалевый корпус, латунная окантовка, тёплый карболит */
+  .mains{width:178px;height:198px;border-radius:14px;cursor:pointer;position:relative;border:2px solid #101312;padding:0;
+    background:
+      repeating-linear-gradient(24deg,#ffffff05 0 1px,transparent 1px 6px),
+      radial-gradient(ellipse at 40% 24%,#47594a,#38473b 55%,#24312a);
+    box-shadow:inset 0 1px 0 #ffffff1a,inset 0 0 30px #0009,0 10px 26px #000d;
+    filter:brightness(.62) saturate(.8);transition:filter .55s ease-out,box-shadow .7s ease-out}   /* обесточен — стоит в потёмках */
+  .mains.on{filter:brightness(1.08) saturate(1.05);
+    box-shadow:inset 0 1px 0 #ffffff1a,inset 0 0 30px #0009,0 10px 26px #000d,0 0 52px #ffb5242e,0 0 18px #e2503a22}   /* включился: тёплый свет упал на корпус */
+  .mains::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;   /* винты по углам */
+    background:
+      radial-gradient(circle at 13px 13px,#c9c4b2 0 2.2px,#3c382f 3.4px,transparent 5.5px),
+      radial-gradient(circle at calc(100% - 13px) 13px,#c9c4b2 0 2.2px,#3c382f 3.4px,transparent 5.5px),
+      radial-gradient(circle at 13px calc(100% - 13px),#c9c4b2 0 2.2px,#3c382f 3.4px,transparent 5.5px),
+      radial-gradient(circle at calc(100% - 13px) calc(100% - 13px),#c9c4b2 0 2.2px,#3c382f 3.4px,transparent 5.5px)}
+  .mains .esc{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:124px;height:124px;border-radius:50%;
+    border:1px solid #4d3b12;
+    background:conic-gradient(from 210deg,#8f6f2e,#e3c37c 22%,#9c7a35 48%,#f0d494 74%,#8f6f2e);   /* латунь */
+    box-shadow:inset 0 2px 3px #ffffff55,inset 0 -3px 6px #0008,0 5px 12px #000c}
+  .mains .esc::after{content:"";position:absolute;inset:9px;border-radius:50%;
+    background:radial-gradient(circle at 42% 32%,#2f2a24,#17130f 72%);box-shadow:inset 0 3px 8px #000c}
+  .mains .knob{position:absolute;left:50%;top:47%;width:90px;height:90px;border-radius:50%;pointer-events:none;
+    transform:translate(-50%,-50%) rotate(-45deg);transition:transform .18s cubic-bezier(.4,1.6,.6,1);
+    background:radial-gradient(circle at 38% 30%,#4a352a,#241812 60%,#0c0705);                    /* карболит */
+    box-shadow:inset 0 2px 2px #ffffff2e,inset 0 -5px 9px #000,0 6px 13px #000d}
+  .mains .knob::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:100px;height:29px;border-radius:15px;
+    background:linear-gradient(180deg,#3d2c22,#140d09);
+    box-shadow:inset 0 2px 0 #ffffff26,inset 0 -3px 5px #000,0 3px 8px #000b}
+  .mains .knob::after{content:"";position:absolute;left:50%;top:6px;transform:translateX(-50%);width:5px;height:15px;border-radius:2px;
+    background:#e8dfc2;box-shadow:0 0 4px #0008}
+  .mains.on .knob{transform:translate(-50%,-50%) rotate(45deg)}
+  .mains .m0,.mains .m1{position:absolute;top:13px;font-family:var(--mono);font-weight:800;font-size:.62rem;
+    color:#34332a;background:#c9c1a4;padding:1px 7px;border-radius:2px;border:1px solid #948a6f;box-shadow:0 1px 2px #0009}
+  .mains .m0{left:24px}
+  .mains .m1{right:24px;color:#7c2213}
+  .mains .jewel{position:absolute;left:50%;bottom:11px;transform:translateX(-50%);width:13px;height:13px;border-radius:50%;
+    background:radial-gradient(circle at 38% 30%,#5a1710,#2a0b07 70%);
+    box-shadow:0 0 0 3px #8f6f2e,0 0 0 4px #4d3b12,inset 0 1px 1px #ffffff30;transition:background .25s,box-shadow .25s}
+  .mains.on .jewel{background:radial-gradient(circle at 38% 30%,#ff9a86,#e2503a 55%,#7c1408);
+    box-shadow:0 0 0 3px #8f6f2e,0 0 0 4px #4d3b12,0 0 15px #e2503a99,inset 0 1px 1px #ffffff50}
+  .bhint{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:#5f6a64;text-transform:uppercase}
+  /* каскад: всё темно, блоки зажигаются по одному */
+  body.booting .app>.top,body.booting .app>.tape,body.booting .app>.mocknote,body.booting .app .panel,body.booting .app>.footplate{
+    filter:brightness(.02) saturate(.25);transition:filter .9s ease-out}
+  /* полусвет: цех проступает из темноты, прежде чем вспыхнут блоки */
+  body.booting.semi .app>.top,body.booting.semi .app>.tape,body.booting.semi .app>.mocknote,body.booting.semi .app .panel,body.booting.semi .app>.footplate{
+    filter:brightness(.16) saturate(.5);transition:filter 1.4s ease-in}
+  body.booting .app .lit,body.booting.semi .app .lit{filter:brightness(1) saturate(1);transition:filter .9s ease-out}
+  .crt.warm{animation:crtWarm 1.05s ease-out}
+  @keyframes crtWarm{0%,52%{filter:brightness(0)}60%{filter:brightness(2.8) contrast(2.2)}74%{filter:brightness(.55)}100%{filter:brightness(1)}}
+  .nixboot{animation:nixF .95s ease-in-out}
+  @keyframes nixF{0%,34%,70%{opacity:.12}18%,52%,88%{opacity:1}}
+  @media(prefers-reduced-motion:reduce){.lamp.train .bulb{animation:none}.crt.warm,.nixboot{animation:none}}
+</style>
+</head>
+<body class="preboot">
+<div class="boot" id="boot">
+  <div class="bootbox">
+    <div class="bplate" data-i18n="mains">Сеть</div>
+    <button class="mains" id="mainsSw" aria-label="включить питание">
+      <span class="m0">0</span><span class="m1">I</span>
+      <span class="esc"></span><span class="knob"></span><span class="jewel"></span>
+    </button>
+    <div class="bhint" data-i18n="mains_hint">подать питание</div>
+  </div>
+</div>
+<div class="app">
+
+  <div class="top">
+    <div class="brand">
+      <svg class="emblem" viewBox="0 0 96 96" aria-hidden="true">
+        <defs>
+          <linearGradient id="emRing" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#e8ece5"/><stop offset=".4" stop-color="#8b938d"/>
+            <stop offset=".72" stop-color="#4d5450"/><stop offset="1" stop-color="#717973"/>
+          </linearGradient>
+          <linearGradient id="emRingIn" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#c9cfc7"/><stop offset=".5" stop-color="#666d67"/><stop offset="1" stop-color="#3a403c"/>
+          </linearGradient>
+          <radialGradient id="emEnamel" cx="38%" cy="28%" r="85%">
+            <stop offset="0" stop-color="#33502f"/><stop offset=".55" stop-color="#223223"/><stop offset="1" stop-color="#121d10"/>
+          </radialGradient>
+          <radialGradient id="emStar" cx="35%" cy="28%" r="80%">
+            <stop offset="0" stop-color="#ea6a4f"/><stop offset=".6" stop-color="#c23a2b"/><stop offset="1" stop-color="#7e2014"/>
+          </radialGradient>
+          <radialGradient id="emDot" cx="32%" cy="28%" r="80%">
+            <stop offset="0" stop-color="#fffdf0"/><stop offset=".7" stop-color="#d9d3ba"/><stop offset="1" stop-color="#94906f"/>
+          </radialGradient>
+          <radialGradient id="emCore" cx="38%" cy="32%" r="80%">
+            <stop offset="0" stop-color="#b4f7bd"/><stop offset=".5" stop-color="#5be070"/><stop offset="1" stop-color="#2c8a3e"/>
+          </radialGradient>
+        </defs>
+        <!-- кольцо с фаской -->
+        <circle cx="48" cy="48" r="45" fill="url(#emRing)"/>
+        <circle cx="48" cy="48" r="45" fill="none" stroke="#00000070" stroke-width="1"/>
+        <circle cx="48" cy="48" r="41.4" fill="url(#emRingIn)"/>
+        <circle cx="48" cy="48" r="41.4" fill="none" stroke="#00000055" stroke-width=".8"/>
+        <!-- блик-дуга по металлу -->
+        <path d="M 16 32 A 37 37 0 0 1 36 13.5" fill="none" stroke="#ffffffb8" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M 79 66 A 37 37 0 0 1 62 80.5" fill="none" stroke="#00000060" stroke-width="1.6" stroke-linecap="round"/>
+        <!-- эмаль с глубиной -->
+        <circle cx="48" cy="48" r="38" fill="url(#emEnamel)"/>
+        <circle cx="48" cy="48" r="37" fill="none" stroke="#000000aa" stroke-width="2" opacity=".5"/>
+        <circle cx="48" cy="48" r="35.5" fill="none" stroke="#cfd6c33e" stroke-width=".8"/>
+        <!-- атом-нейрон -->
+        <g stroke="#cfd6c3" stroke-width="1.5" fill="none" opacity=".92">
+          <ellipse cx="48" cy="52" rx="24" ry="9"/>
+          <ellipse cx="48" cy="52" rx="24" ry="9" transform="rotate(62 48 52)"/>
+          <ellipse cx="48" cy="52" rx="24" ry="9" transform="rotate(-62 48 52)"/>
+        </g>
+        <circle cx="48" cy="52" r="9" fill="#5be07022"/>
+        <circle cx="48" cy="52" r="4.6" fill="url(#emCore)"/>
+        <circle cx="46.6" cy="50.4" r="1.1" fill="#ffffffcc"/>
+        <!-- электроны-шарики -->
+        <g stroke="#00000050" stroke-width=".5">
+          <circle cx="24" cy="52" r="2.2" fill="url(#emDot)"/>
+          <circle cx="72" cy="52" r="2.2" fill="url(#emDot)"/>
+          <circle cx="59.5" cy="72" r="2.2" fill="url(#emDot)"/>
+          <circle cx="36.5" cy="32" r="2.2" fill="url(#emDot)"/>
+        </g>
+        <!-- гранёная звезда -->
+        <path d="M48 12.6 L50 18.2 L55.9 18.3 L51.2 21.8 L52.9 27.4 L48 24.1 L43.1 27.4 L44.8 21.8 L40.1 18.3 L46 18.2 Z" fill="url(#emStar)" stroke="#5e150c" stroke-width=".7"/>
+        <path d="M48 12.6 L50 18.2 L48 19.4 Z" fill="#ffffff38"/>
+        <path d="M48 12.6 L46 18.2 L48 19.4 Z" fill="#00000028"/>
+        <!-- глянцевый купол поверх всего значка -->
+        <ellipse cx="42" cy="30" rx="27" ry="14" fill="#ffffff14"/>
+      </svg>
+      <div><h1><span class="t1" data-i18n="title_top">Нейро-станция</span><span class="t2" data-i18n="title_main">«МНИСТ-1»</span></h1>
+        <small data-i18n="subtitle">система распознавания рукописных цифр · борт № 784-30-10</small></div></div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <div class="vent" aria-hidden="true"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <div style="display:flex;gap:9px;align-items:center">
+          <button id="langbtn" class="muteb">EN</button>
+          <button id="mute" class="muteb">🔊 звук</button>
+          <div class="lamp wait" id="phase"><span class="bulb"></span><span id="phaseTxt" class="cyr">ожидание</span></div>
+        </div>
+        <div class="serial" data-i18n="serial">ГОСТ 5.1 · изд. 001 · СССР</div></div>
+    </div>
+  </div>
+  <div class="tape" aria-hidden="true"></div>
+  <div class="mocknote" data-i18n-html="mocknote">Настоящая сеть 784→30→10, собранная с нуля (init · forward · backward · SGD). Обучение и распознавание — по-честному, на реальном MNIST.</div>
+
+  <div class="stage">
+    <div class="panel">
+      <span class="plwrap"><span class="plate" id="padPlate">Ручной ввод образа</span><button class="hbtn" data-help="h_pad" aria-label="справка">?</button></span>
+      <div class="crt"><canvas id="pad" width="224" height="224"></canvas></div>
+      <div class="padbtns"><button class="cbtn" id="clearPad" data-i18n="clear">Очистка</button><button class="cbtn" id="randPad" data-i18n="sample">Образец</button></div>
+      <div class="padhint" id="padHint" data-i18n="hint_draw">Начертите цифру пером. Станция распознаёт справа. До обучения — гадает наугад.</div>
+    </div>
+    <div class="panel netpanel">
+      <span class="plwrap"><span class="plate" data-i18n="p_net">Схема сети</span><button class="hbtn" data-help="h_net" aria-label="справка">?</button></span><span class="vtoggle"><span class="vt on" id="vtScheme" data-i18n="view_scheme">схема</span><button class="vtsw" id="viewSw" aria-label="вид: схема или числа"></button><span class="vt" id="vtMatrix" data-i18n="view_matrix">числа</span></span>
+      <div class="crt boardwrap" id="boardwrap" hidden>
+        <canvas id="wboard"></canvas>
+        <div class="bzoom"><button id="bzIn" title="приблизить">+</button><button id="bzOut" title="отдалить">−</button><button id="bzFit" title="обзор всей сети">⊞</button></div>
+        <div class="bhud" id="boardHud">—</div>
+        <div class="bhint" data-i18n="board_hint">ТЯНИ ДОСКУ · КОЛЕСО = ПАН</div>
+      </div>
+      <div class="crt netwrap" id="netwrap">
+        <div class="netlabels"><span class="nl" data-i18n="in">ВХОД·784</span><span class="nl" id="midLabel">СКРЫТЫЙ·30</span><span class="nl" data-i18n="out">ВЫХОД·10</span></div>
+        <canvas id="net" width="620" height="420"></canvas>
+        <div class="legend">
+          <i><span class="dot" style="background:var(--phos);box-shadow:0 0 6px var(--phos)"></span><span data-i18n="signal">СИГНАЛ →</span></i>
+          <i><span class="dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></span><span data-i18n="gradient">← ГРАДИЕНТ</span></i></div>
+        <div class="nowlearn"><span class="cyr" data-i18n="trainingOn">обучение на</span><canvas id="exThumb" width="28" height="28"></canvas><span id="exLbl">—</span></div>
+        <div class="paper" id="paper">
+          <svg class="pwm" viewBox="0 0 96 96" aria-hidden="true">
+            <g fill="none" stroke="#3d3a26" stroke-width="2">
+              <circle cx="48" cy="48" r="42"/><circle cx="48" cy="48" r="35"/>
+              <ellipse cx="48" cy="52" rx="24" ry="9"/>
+              <ellipse cx="48" cy="52" rx="24" ry="9" transform="rotate(62 48 52)"/>
+              <ellipse cx="48" cy="52" rx="24" ry="9" transform="rotate(-62 48 52)"/>
+            </g>
+            <circle cx="48" cy="52" r="4.4" fill="#3d3a26"/>
+            <path d="M48 13 L50 18.4 L55.6 18.5 L51.1 21.9 L52.8 27.2 L48 24 L43.2 27.2 L44.9 21.9 L40.4 18.5 L46 18.4 Z" fill="#3d3a26"/>
+          </svg>
+          <div id="paperLines"></div><div class="pstamp" id="pstamp"></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <span class="plwrap"><span class="plate" data-i18n="p_reco">Распознано</span><button class="hbtn" data-help="h_reco" aria-label="справка">?</button></span>
+      <div class="obars" id="obars"></div>
+      <div class="guess unsure" id="guess"><div class="lbl" data-i18n="answer">ответ</div><div><span class="nixie" id="guessBig">0</span><span class="gmark" id="guessMark" hidden>✓</span></div></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="panel ctrls">
+      <span class="plwrap"><span class="plate" data-i18n="p_train">Обучение</span><button class="hbtn" data-help="h_train" aria-label="справка">?</button></span>
+      <span class="sock"><button class="bigbtn w1" id="ep1" data-i18n="cycle1">Цикл ×1</button></span>
+      <span class="sock"><button class="bigbtn w2" id="ep30" data-i18n="cycleAll">Все эпохи</button></span>
+      <span class="guard" id="resetGuard"><button class="bigbtn red" id="reset" data-i18n="resetW">Сброс весов</button><span class="cover" id="resetCover" title="откинь крышку"></span></span>
+      <div class="epwrap"><span class="cyr"><span data-i18n="epoch">эпоха</span> <b id="epNum">0/30</b></span><span class="cyr"><span data-i18n="batch">пакет</span> <b id="batchNum">—</b></span></div>
+    </div>
+    <div class="panel chartcard">
+      <div class="ctitle"><span class="plate sm" data-i18n="p_lossChart">График ошибки ↓</span><button class="hbtn" data-help="h_loss" aria-label="справка">?</button><div class="nx inl" style="margin-left:auto"><span class="v" id="lossV">—</span></div></div>
+      <div class="crt amber"><div id="lossChart"></div></div>
+      <div class="cap" data-i18n-html="cap_loss"><b>Средний квадрат промаха</b> на обучающей выборке. Каждая эпоха — точка. Чем ниже кривая, тем точнее backprop подогнал веса.</div>
+    </div>
+    <div class="panel chartcard">
+      <div class="ctitle"><span class="plate sm" data-i18n="p_accChart">Точность ↑</span><button class="hbtn" data-help="h_acc" aria-label="справка">?</button><div class="nx inl" style="margin-left:auto"><span class="v" id="accV">—</span></div></div>
+      <div class="accrow">
+        <div class="gaugebox"><div id="gauge"></div></div>
+      </div>
+      <div class="cap" data-i18n-html="cap_acc"><b>Доля верно распознанных</b> цифр на контрольной выборке — которую сеть при обучении не видела. Честная проверка навыка.</div>
+    </div>
+  </div>
+
+  <!-- фонд данных -->
+  <div class="panel" style="margin-top:14px">
+    <span class="plwrap"><span class="plate" id="fundPlate">Фонд данных · 50 000 образцов</span><button class="hbtn" data-help="h_fund" aria-label="справка">?</button></span>
+    <div class="fundgrid">
+      <div>
+        <span class="plate sm" data-i18n="p_show">Витрина · 0–9</span>
+        <div class="film"><canvas id="film" width="360" height="30"></canvas></div>
+        <div class="cap" style="border-top:none;padding-top:6px" data-i18n-html="data_cap"><b>МНИСТ</b> — рукописные цифры (NIST, США, 1998). Обучающая выборка 50 000, контрольная 10 000, растр 28×28.</div>
+      </div>
+      <div>
+        <span class="plate sm" data-i18n="p_mosaic">Карта фонда</span>
+        <div class="mosaicbox"><canvas id="mosaic" width="500" height="100"></canvas></div>
+        <div class="odo">
+          <span class="olbl" data-i18n="odo_lbl">обработано образцов</span>
+          <div class="ododig" id="odo"></div>
+        </div>
+        <div class="cap" data-i18n-html="fund_cap"><b>Каждая точка — один образец</b>, всего 50 000. За эпоху станция прочитывает фонд целиком: засветка — прочитанное текущей эпохой.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <span class="plwrap"><span class="plate" id="galPlate">Скрытый слой · что выучили 30 нейронов</span><button class="hbtn" data-help="h_gal" aria-label="справка">?</button></span>
+    <div class="tiles" id="tiles"></div>
+  </div>
+
+  <!-- config (moved to bottom) -->
+  <div class="panel" style="margin-top:14px">
+    <span class="plwrap"><span class="plate" data-i18n="p_cfg">Конфигурация · гиперпараметры</span><button class="hbtn" data-help="h_cfg" aria-label="справка">?</button></span>
+    <div class="cfgrid">
+      <div class="cfg"><div class="lab"><span data-i18n="cfg_hidden">размер скрытого слоя</span><b id="cHidV">30</b></div>
+        <input type="range" class="pot" id="cHid" min="5" max="100" step="5" value="30"></div>
+      <div class="cfg"><div class="lab"><span data-i18n="cfg_layers">число скрытых слоёв</span><b id="cLayV">1</b></div>
+        <div class="seg" id="cLay"><button data-v="1" class="on">1</button><button data-v="2">2</button><button data-v="3">3</button></div></div>
+      <div class="cfg"><div class="lab"><span data-i18n="cfg_eta">скорость обучения η</span><b id="cEtaV">1.0</b></div>
+        <input type="range" class="pot danger" id="cEta" min="0.1" max="10" step="0.1" value="1"></div>
+      <div class="cfg"><div class="lab"><span data-i18n="cfg_batch">размер батча</span><b id="cBatV">20</b></div>
+        <input type="range" class="pot" id="cBat" min="1" max="100" step="1" value="20"></div>
+      <div class="cfg"><div class="lab"><span data-i18n="cfg_epochs">число эпох</span><b id="cEpV">30</b></div>
+        <input type="range" class="pot" id="cEp" min="1" max="60" step="1" value="30"></div>
+    </div>
+  </div>
+
+  <div class="footplate">
+    <span class="riv l"></span><span class="riv r"></span>
+    <h3 data-i18n="foot_title">Нейро-станция «МНИСТ-1» · зав. № 0001</h3>
+    <p data-i18n-html="foot_text">Основано на книге Майкла Нильсена <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> и его работе.</p>
+    <div class="gost" data-i18n="foot_gost">СДЕЛАНО В БРАУЗЕРЕ · ГОСТ 784-30-10 · 1986 г.</div>
+  </div>
+</div>
+
+<div class="tcard" id="tcard" hidden aria-hidden="true">
+  <div class="tch" id="tcHead">ТАБЕЛЬ ИСПЫТАНИЙ · «МНИСТ-1»</div>
+  <div class="tcb" id="tcStage">—</div>
+  <div class="tca" id="tcAcc">—</div>
+  <div class="tholes" id="tcHoles"></div>
+  <div class="tstamp" id="tcStamp">ЭТАП</div>
+</div>
+
+<div class="helper" id="helper" hidden>
+  <div class="hportr"><img src="neironov.png" alt="тов. Полуэктов, научный сотрудник"></div>
+  <div class="hbody">
+    <div class="hname"><b id="hName">тов. Полуэктов</b>
+      <div class="hctl"><button class="hvoice" id="hVoice" aria-label="голос">🔊</button><button class="hx" id="hClose" aria-label="закрыть">✕</button></div></div>
+    <div class="htext" id="hText"></div>
+  </div>
+</div>
+
+<script src="net.browser.js"></script>
+<script src="mnist-data.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const DPR=Math.min(2,window.devicePixelRatio||1);
+function fitCanvas(c,w,h){c.width=w*DPR;c.height=h*DPR;const x=c.getContext('2d');x.setTransform(DPR,0,0,DPR,0,0);return x;}
+const CFG={hidden:30,layers:1,eta:1.0,batch:20,epochs:15};   // дефолт медленнее нильсеновского (3.0/10), чтобы рост был виден; его значения доступны ползунками
+const S={phase:'untrained',epoch:0,loss:[],acc:[],target:0,drawn:false,recognizeFrames:0,diverge:false,exLabel:null,inputGrid:new Float32Array(144),inputVec:null};
+
+/* ---------- audio ---------- */
+let AC=null,muted=false,humNode=null,humGain=null,lastCfg=0;
+const ac=()=>{if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+  if(AC&&AC.state==='suspended')AC.resume();return AC;};
+function tone(f,d,type,v,when,f2){const c=ac();if(!c||muted)return;const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+(when||0);
+  o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(v||.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02);}
+function noise(d,v,lp,hp,when){const c=ac();if(!c||muted)return;const n=Math.floor(c.sampleRate*d),b=c.createBuffer(1,n,c.sampleRate),ch=b.getChannelData(0);
+  for(let i=0;i<n;i++)ch[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const g=c.createGain(),t=c.currentTime+(when||0);
+  g.gain.setValueAtTime(v||.05,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);let node=s;
+  if(lp){const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=lp;node.connect(f);node=f;}
+  if(hp){const f=c.createBiquadFilter();f.type='highpass';f.frequency.value=hp;node.connect(f);node=f;}
+  node.connect(g).connect(c.destination);s.start(t);s.stop(t+d);}
+const SFX={clunk(){noise(.05,.09,1200);tone(85,.09,'sine',.07);},click(){noise(.02,.05,3200,700);},tick(){tone(1500,.014,'square',.022);},
+  ping(){tone(520,.14,'triangle',.05,0,880);},klaxon(){tone(185,.18,'sawtooth',.06);tone(150,.2,'sawtooth',.05,.19);},
+  spinUp(){tone(58,.5,'sawtooth',.05,0,210);},done(){tone(300,.14,'triangle',.06);tone(400,.16,'triangle',.06,.14);tone(520,.22,'triangle',.05,.3);},power(){tone(240,.42,'sawtooth',.05,0,66);},
+  feed(){tone(1180,.012,'square',.016);},stamp(){noise(.12,.2,700);tone(58,.22,'sine',.12);tone(46,.3,'sine',.07,.05);},
+  horn(){tone(110,1.1,'sawtooth',.05);tone(113,1.1,'sawtooth',.045);tone(55,1.2,'sine',.04);},
+  mains(){noise(.1,.24,420);tone(34,.8,'sine',.14);tone(26,1.6,'sawtooth',.05,0,57);},
+  /* сцена включения: всё содержание — в слышимой середине, низы лишь поддержка */
+  mainsBig(){ // бросок пакетника: лязг, дребезг контактов, удар, разгон трансформатора
+    noise(.03,.34,2600,500);noise(.025,.2,1400,300,.045);noise(.02,.14,1800,400,.085);
+    noise(.09,.3,700);tone(95,.12,'sine',.16);tone(34,.9,'sine',.12);
+    surge();},
+  floodLight(){ // дальний контактор + люминесцентные лампы зажигаются со стартерным дребезгом
+    noise(.05,.24,500);tone(72,.1,'sine',.12);
+    [0,.12,.19,.33,.41,.62].forEach((w,i)=>noise(.02,.11+.012*i,3400,1300,w+.12));
+    tone(118,.9,'triangle',.04,.72);tone(236,.9,'triangle',.022,.72);},
+  relay(){noise(.018,.16,2600,900);noise(.035,.1,900);tone(130,.045,'sine',.07,.006);},   // реле блока: слышный щёлк
+  punch(){noise(.03,.3,1800,400);noise(.05,.14,700,0,.02);tone(72,.09,'sine',.13,.01);tone(210,.05,'square',.045,.012);},   // компостер: лязг и пробой
+  crt(){noise(.4,.05,5200,1100);tone(130,.3,'sine',.07,.05);},
+  ready(){tone(988,.09,'square',.045);tone(988,.11,'square',.045,.17);},
+  /* механика: только фильтрованный шум + низкий глухой удар, без «пищалок» */
+  key(){noise(.028,.17,1050);tone(64,.06,'sine',.11,.005);},                         // толстая клавиша: тук
+  coverUp(){noise(.014,.11,3600,1400);noise(.05,.09,800,0,.03);tone(96,.05,'sine',.07,.03);},   // защёлка + пластик об упор
+  coverDown(){noise(.045,.13,650);tone(58,.08,'sine',.11,.01);},                     // крышка легла
+  print(){for(let k=0;k<6;k++)noise(.015,.05,3000,700,k*.032);},
+  slide(){noise(.5,.04,900,150);},
+  bell(){tone(1319,.55,'sine',.05);tone(2637,.3,'sine',.018);}};
+function surge(){ // трансформатор набирает обороты: два расстроенных пилообразных под открывающимся фильтром
+  const c=ac();if(!c||muted)return;const t=c.currentTime;
+  const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.09,t+1.1);g.gain.exponentialRampToValueAtTime(.0001,t+2.6);
+  const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(150,t);
+  lp.frequency.exponentialRampToValueAtTime(760,t+1.3);lp.frequency.exponentialRampToValueAtTime(240,t+2.6);
+  for(const det of[0,1.7]){const o=c.createOscillator();o.type='sawtooth';
+    o.frequency.setValueAtTime(43+det,t);o.frequency.exponentialRampToValueAtTime(57+det,t+1.2);
+    o.connect(lp);o.start(t);o.stop(t+2.7);}
+  lp.connect(g).connect(c.destination);}
+function humOn(){const c=ac();if(!c||muted||humNode)return;humNode=c.createOscillator();humGain=c.createGain();humNode.type='sawtooth';humNode.frequency.value=57;humGain.gain.value=.022;
+  const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=230;humNode.connect(lp).connect(humGain).connect(c.destination);humNode.start();}
+function humOff(){if(humNode){try{const c=ac();humGain.gain.setTargetAtTime(0,c.currentTime,.12);humNode.stop(c.currentTime+.5);}catch(e){}humNode=null;}}
+function humGlideOff(){ // выключение «под нагрузкой»: обороты падают, гул тонет
+  if(!humNode)return;
+  try{const c=ac(),tt=c.currentTime;
+    humNode.frequency.setValueAtTime(57,tt);humNode.frequency.linearRampToValueAtTime(21,tt+1.4);
+    humGain.gain.setValueAtTime(humGain.gain.value,tt);humGain.gain.exponentialRampToValueAtTime(.0001,tt+1.4);
+    humNode.stop(tt+1.6);}catch(e){}
+  humNode=null;}
+function cfgTick(){const t=Date.now();if(t-lastCfg>70){lastCfg=t;SFX.click();}}
+document.addEventListener('pointerdown',()=>{const c=ac();if(c&&c.state==='suspended')c.resume();});
+
+/* ---------- localization ---------- */
+const ln=(l,v)=>(l+' ').padEnd(21,'.')+' '+v;   // строка протокола: МЕТКА ...... значение
+const I18N={
+  ru:{title_top:'Нейро-станция',title_main:'«МНИСТ-1»',subtitle:'система распознавания рукописных цифр · борт № 784-30-10',
+    serial:'ТУ 784.30.10-86 · разработка НИИЧАВО, г. Соловец · изд. 001 · СССР',
+    foot_title:'Нейро-станция «МНИСТ-1» · зав. № 0001',
+    foot_text:'Основано на книге Майкла Нильсена <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> и его работе.',
+    foot_gost:'СДЕЛАНО В БРАУЗЕРЕ · ГОСТ 784-30-10 · 1986 г.',
+    mocknote:'Настоящая сеть 784→30→10, собранная с нуля (init · forward · backward · SGD). Обучение и распознавание — по-честному, на реальном MNIST.',
+    p_input:'Ручной ввод образа',clear:'Очистка',sample:'Образец',hint_draw:'Начертите цифру пером. Станция распознаёт справа. До обучения — гадает наугад.',
+    p_net:'Схема сети',view_scheme:'схема',view_matrix:'числа',board_hint:'ТЯНИ ДОСКУ · КОЛЕСО = ПАН',in:'ВХОД·784',out:'ВЫХОД·10',signal:'СИГНАЛ →',gradient:'← ГРАДИЕНТ',trainingOn:'обучение на',p_reco:'Распознано',answer:'ответ',
+    p_train:'Обучение',cycle1:'Цикл ×1',cycleAll:'Все эпохи',resetW:'Сброс весов',epoch:'эпоха',batch:'пакет',err:'ошибка',acc:'точность %',
+    p_lossChart:'График ошибки ↓',trainSeries:'■ обуч.',p_accChart:'Точность ↑',testSeries:'■ контр.',
+    cap_loss:'<b>Средний квадрат промаха</b> обучающих батчей, точка на каждый шаг. Шкала логарифмическая: равный сдвиг вниз = улучшение во столько же РАЗ.',
+    cap_acc:'<b>Доля верно распознанных</b> цифр на контрольной выборке — которую сеть при обучении не видела. Честная проверка навыка.',
+    p_cfg:'Конфигурация · гиперпараметры',cfg_hidden:'размер скрытого слоя',cfg_layers:'число скрытых слоёв',cfg_eta:'скорость обучения η',cfg_batch:'размер батча',cfg_epochs:'число эпох',
+    cfg_hint:'Изменение конфигурации сбрасывает сеть заново. η выше ~8 → <span style="color:var(--red)">расхождение</span> · 3 слоя с сигмоидой → застой (затухающий градиент).',
+    ph_wait:'ожидание',ph_train:'обучение',ph_done:'готово',ph_diverge:'расходится!',hidden:'СКРЫТЫЙ',sound:'звук',label:'метка',
+    p_input_feed:'Лента образцов · обучение',hint_feed:'Станция читает обучающие образцы. Слева — что видит, справа — что отвечает; ✓ — угадала.',
+    p_data:'Фонд данных',data_cap:'<b>МНИСТ</b> — рукописные цифры (NIST, США, 1998). Обучающая выборка 50 000, контрольная 10 000, растр 28×28.',
+    p_fund:n=>`Фонд данных · ${n.toLocaleString('ru-RU')} образцов`,p_show:'Витрина · 0–9',p_mosaic:'Карта фонда',odo_lbl:'обработано образцов',
+    fund_cap:'<b>Каждая точка — один образец</b>, всего 50 000. За эпоху станция прочитывает фонд целиком: засветка — прочитанное текущей эпохой.',
+    hint_test:'Станция обучена и готова к испытанию. Начертите цифру пером — проверьте её.',
+    proto_hdr:n=>`ПРОТОКОЛ ОБУЧЕНИЯ № ${String(n).padStart(3,'0')}`,sep:'═══════════════════════',
+    proto:(ep,seen,w,loss,acc)=>[ln('ЭПОХ ПРОЙДЕНО',ep),ln('ОБРАЗЦОВ ПОДАНО',seen.toLocaleString('ru-RU')),
+      ln('ВЕСОВ НАСТРОЕНО',w.toLocaleString('ru-RU')),ln('ОШИБКА',loss.toFixed(2)),ln('ТОЧНОСТЬ',acc.toFixed(0)+' %')],
+    verd:acc=>acc>=85?'ГОДЕН':acc>=60?'УСЛОВНО ГОДЕН':'БРАК',verd_line:v=>'ЗАКЛЮЧЕНИЕ: '+v,
+    stampw:acc=>acc>=60?'ОТК·1<br>ПРИНЯТО':'БРАК',etap:(e,n)=>`Этап ${e} / ${n} пройден`,
+    mains:'Сеть',mains_hint:'подать питание',helper_name:'тов. Полуэктов · научн. сотр.',helper_voice:'голос',
+    gal:(n,cap)=>`Скрытый слой · что выучили ${n} нейронов`+(cap?' (показаны 50)':'')},
+  en:{title_top:'Neural Station',title_main:'«MNIST-1»',subtitle:'handwritten-digit recognition system · unit no. 784-30-10',
+    serial:'Spec 784.30.10-86 · developed at NITWiT, Solovets · unit 001 · USSR',
+    foot_title:'Neuro-Station «MNIST-1» · serial no. 0001',
+    foot_text:'Based on Michael Nielsen\'s book <a href="http://neuralnetworksanddeeplearning.com" target="_blank" rel="noopener">«Neural Networks and Deep Learning»</a> and his work.',
+    foot_gost:'MADE IN A BROWSER · GOST 784-30-10 · 1986',
+    mocknote:'A real 784→30→10 network built from scratch (init · forward · backward · SGD). Training and recognition are genuine, on actual MNIST.',
+    p_input:'Manual image input',clear:'Clear',sample:'Sample',hint_draw:'Draw a digit with the pen. The station recognizes it on the right. Before training it just guesses.',
+    p_net:'Network diagram',view_scheme:'scheme',view_matrix:'digits',board_hint:'DRAG THE BOARD · WHEEL PANS',in:'INPUT·784',out:'OUTPUT·10',signal:'SIGNAL →',gradient:'← GRADIENT',trainingOn:'training on',p_reco:'Recognized',answer:'answer',
+    p_train:'Training',cycle1:'Cycle ×1',cycleAll:'All epochs',resetW:'Reset weights',epoch:'epoch',batch:'batch',err:'error',acc:'accuracy %',
+    p_lossChart:'Error graph ↓',trainSeries:'■ train',p_accChart:'Accuracy ↑',testSeries:'■ test',
+    cap_loss:'<b>Mean squared miss</b> of the training batches, one point per step. Log scale: an equal drop means an equal improvement RATIO.',
+    cap_acc:'<b>Fraction correctly recognized</b> on the test set — which the net never saw during training. An honest skill check.',
+    p_cfg:'Configuration · hyperparameters',cfg_hidden:'hidden layer size',cfg_layers:'number of hidden layers',cfg_eta:'learning rate η',cfg_batch:'batch size',cfg_epochs:'number of epochs',
+    cfg_hint:'Changing the configuration rebuilds the net from scratch. η above ~8 → <span style="color:var(--red)">divergence</span> · 3 sigmoid layers → stall (vanishing gradient).',
+    ph_wait:'idle',ph_train:'training',ph_done:'done',ph_diverge:'diverging!',hidden:'HIDDEN',sound:'sound',label:'label',
+    p_input_feed:'Sample feed · training',hint_feed:'The station is reading training samples. Left — what it sees, right — what it answers; ✓ — correct.',
+    p_data:'Data stock',data_cap:'<b>MNIST</b> — handwritten digits (NIST, USA, 1998). Training set 50,000, test set 10,000, 28×28 raster.',
+    p_fund:n=>`Data stock · ${n.toLocaleString('en-US')} samples`,p_show:'Showcase · 0–9',p_mosaic:'Stock map',odo_lbl:'samples processed',
+    fund_cap:'<b>Every dot is one sample</b> — 50,000 in total. Each epoch the station reads the whole stock: the lit band is what the current epoch has consumed.',
+    hint_test:'The station is trained and ready for trial. Draw a digit — put it to the test.',
+    proto_hdr:n=>`TRAINING PROTOCOL № ${String(n).padStart(3,'0')}`,sep:'═══════════════════════',
+    proto:(ep,seen,w,loss,acc)=>[ln('EPOCHS COMPLETED',ep),ln('SAMPLES FED',seen.toLocaleString('en-US')),
+      ln('WEIGHTS TUNED',w.toLocaleString('en-US')),ln('ERROR',loss.toFixed(2)),ln('ACCURACY',acc.toFixed(0)+' %')],
+    verd:acc=>acc>=85?'PASS':acc>=60?'CONDITIONAL':'REJECT',verd_line:v=>'VERDICT: '+v,
+    stampw:acc=>acc>=60?'QC·1<br>PASSED':'REJECT',etap:(e,n)=>`Stage ${e} / ${n} complete`,
+    mains:'Mains',mains_hint:'switch power on',helper_name:'Poluektov · research fellow',helper_voice:'voice',
+    gal:(n,cap)=>`Hidden layer · what ${n} neurons learned`+(cap?' (showing 50)':'')}};
+let LANG='ru';const t=k=>I18N[LANG][k];
+function setLang(lang){LANG=lang;document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{el.innerHTML=t(el.dataset.i18nHtml);});
+  $('phaseTxt').textContent=t(S.phase==='untrained'?'ph_wait':S.phase==='training'?(S.diverge?'ph_diverge':'ph_train'):'ph_done');
+  $('mute').textContent=(muted?'🔇 ':'🔊 ')+t('sound');
+  $('midLabel').textContent=t('hidden')+'·'+CFG.hidden+(CFG.layers>1?'×'+CFG.layers:'');
+  $('galPlate').textContent=t('gal')(CFG.hidden,CFG.hidden>50);
+  $('exLbl').textContent=S.exLabel!=null?t('label')+' '+S.exLabel:'—';
+  $('padPlate').textContent=t(running?'p_input_feed':'p_input');
+  $('padHint').textContent=t(running?'hint_feed':'hint_draw');
+  $('fundPlate').textContent=t('p_fund')(TRAIN.length);
+  $('hName').textContent=t('helper_name');$('hVoice').textContent=hVoiceOn?'🔊':'🔇';
+  if(typeof hKey!=='undefined'&&hKey&&$('helper').classList.contains('up'))showHelper(hKey);   // перечитать реплику на другом языке
+  $('langbtn').textContent=lang==='ru'?'EN':'РУ';}
+
+/* ---------- помощник: тов. Нейронов ---------- */
+const HELP_RU={intro:'Здравствуйте, товарищ! Я — научный сотрудник Полуэктов, при сём аппарате состою. Перед вами Нейро-станция МНИСТ-1: настоящая нейросеть, которая прямо в браузере учится читать рукописные цифры. Включайте рубильник — наука ждать не любит.',start:'Станция под напряжением! Порядок таков: начертите пером цифру — необученная машина будет гадать. Затем нажмите «Все эпохи» и следите за приборами: ошибка вниз, точность вверх. После обучения испытайте её снова. А ежели что неясно — жмите жёлтую кнопку со знаком вопроса.',h_pad:'Панель ручного ввода, товарищ. Пером начертите цифру 0–9 в поле 28×28 — станция переведёт штрихи в 784 пикселя и подаст на вход сети. При обучении это поле обращается в ленту образцов, бегущих сквозь машину. Рисуйте крупно и по центру — так распознаётся вернее.',h_net:'Схема сети, товарищ: 784 входа, скрытый слой, 10 выходов. Зелёные точки — сигнал, текущий вперёд; красные — градиент, текущий назад. Заметьте: красные идут лишь от выхода к скрытому слою. Веса входного слоя правятся на месте — δ, помноженная на пиксель. Вся арифметика учения — здесь, перед Вами.',h_board:'Доска чисел, товарищ: вся сеть как есть — каждый вес и каждое смещение, слой за слоем. Тяните доску пером или колесом; адреса строк и столбцов — по краям. При учении правленные веса вспыхивают: зелёным — вес подрос, красным — убавился. Заметьте: у краёв W¹ числа мертвы — те пиксели во входе всегда пусты.',h_reco:'Табло «Распознано»: десять ламп-вероятностей и нумераторная лампа с ответом. Чем ярче лампа, тем увереннее машина в этой цифре. У необученной сети огни ровны и тусклы — она гадает. По мере учения одна лампа разгорается, прочие меркнут. Вот так выглядит уверенность.',h_train:'Пульт обучения, товарищ. «Цикл×1» проводит один мини-батч; «Все эпохи» гонит полный курс; «Сброс весов» возвращает машину к незнанию. Эпоха — полный проход по 50 000 образцам. Метод — стохастический градиентный спуск с обратным распространением. Наблюдайте за прочими приборами: они всё расскажут.',h_loss:'График ошибки: средний квадрат промаха по обучающим батчам, точка на каждый шаг. Шкала логарифмическая — равный сдвиг вниз означает улучшение во столько же раз. Линия должна оседать; рывки вверх — норма, батчи разные. Ежели линия ползёт вверх упорно — скорость учения завышена.',h_acc:'Прибор точности, товарищ: доля верных ответов на контрольной выборке в 10 000 цифр, коих сеть при учении не видела. Оттого показание честное — истинное умение, а не заучивание. Стрелка ползёт от одной десятой (чистое гадание) к девяти с лишним. Вот подлинная мера успеха.',h_fund:'Фонд данных: витрина цифр 0–9 и карта на 50 000 точек — точка есть образец. Засветкой отмечены те, что эпоха уже прочла; одометр внизу считает обработанные. Наблюдайте, как волна засветки проходит по карте — это и есть эпоха в работе. Данные — из архива НИСТ США, 1998 год.',h_gal:'Скрытый слой, товарищ: тепловая карта весов каждого нейрона, 28×28. Зелёное — веса положительные, красное — отрицательные. У необученной сети снег, хаос. По мере учения проступают штрихи и петли: нейроны выучивают части цифр. Загляните сюда после нескольких эпох — зрелище поучительное.',h_cfg:'Конфигурация, товарищ: пять ручек, и каждая пересобирает машину заново. Скрытый слой (5–100): больше нейронов — тоньше распознавание, да медленнее. Число слоёв (1–3): три сигмоидных дают затухающий градиент и застой. Скорость η: выше восьми — расхождение, машину несёт вразнос. Батч (1–100): мал — шумно, но точно; велик — гладко, но грубо. Эпохи (1–60): дольше учишь — дальше продвинешься, до предела.'};
+const HELP_EN={intro:'Greetings, comrade! I am Poluektov, research fellow with this apparatus. Before you is Neuro-Station MNIST-1: a real neural network that learns to read handwritten digits right in your browser. Flip the mains switch — and let us begin.',start:'The station is live! The order is this: draw a digit with the pen — the untrained machine will merely guess. Then press «All epochs» and watch the instruments: error falls, accuracy climbs. Afterwards, test it again. Should anything puzzle you — press a yellow question-mark button.',h_pad:'The manual input panel, comrade. Draw a digit 0–9 with the pen upon the 28×28 field — the station turns your strokes into 784 pixels and feeds them to the net. During training this field becomes a ribbon of samples running through the machine. Draw large and centred; it reads truer that way.',h_net:'The network schematic, comrade: 784 inputs, a hidden layer, 10 outputs. Green dots are the signal flowing forward; red dots the gradient flowing back. Note: the red runs only from output to hidden layer. Input-layer weights are corrected in place — δ times the pixel. All the arithmetic of learning sits here before you.',h_board:'The number board, comrade: the whole net as it is — every weight and every bias, layer by layer. Drag the board with the pen or the wheel; row and column addresses sit at the edges. During training, adjusted weights flash: green — the weight grew, red — it shrank. Note the dead numbers at the edges of W¹ — those input pixels are always empty.',h_reco:'The «Recognised» board: ten probability lamps and a nixie lamp bearing the answer. The brighter the lamp, the surer the machine of that digit. In an untrained net all lamps glow dim and even — it is merely guessing. As learning proceeds, one lamp flares while the rest fade. Thus looks conviction.',h_train:'The training console, comrade. «Cycle×1» runs one mini-batch; «All epochs» drives the full course; «Reset weights» returns the machine to ignorance. An epoch is one full pass over 50,000 samples. The method — stochastic gradient descent with backpropagation. Watch the other instruments; they will tell you everything.',h_loss:'The error chart: mean squared miss over training batches, a point per step. The scale is logarithmic — an equal drop means improvement by the same factor. The line ought to settle; upward jerks are normal, for batches differ. Should it climb stubbornly, your learning rate is set too high.',h_acc:'The accuracy meter, comrade: the share of correct answers on a control set of 10,000 digits the net never saw in training. Hence the reading is honest — true skill, not rote. The needle creeps from one-tenth (pure guessing) toward nine and above. This is the genuine measure of success.',h_fund:'The data fund: a showcase of digits 0–9 and a map of 50,000 points — each point a sample. Lit points are those the epoch has already read; the odometer below counts the processed. Watch the wave of light sweep across the map — that is an epoch at work. The data hails from the US NIST archive, 1998.',h_gal:'The hidden layer, comrade: a heat map of each neuron\'s weights, 28×28. Green marks positive weights, red the negative. In an untrained net — snow, pure chaos. As learning proceeds, strokes and loops emerge: the neurons learn the parts of digits. Look in here after a few epochs — an instructive sight.',h_cfg:'Configuration, comrade: five knobs, and each rebuilds the machine anew. Hidden layer (5–100): more neurons, finer recognition, yet slower. Layers (1–3): three sigmoid layers bring a vanishing gradient and stagnation. Rate η: above eight — divergence, the machine runs wild. Batch (1–100): small is noisy but precise; large is smooth but coarse. Epochs (1–60): the longer you teach, the further you get.'};
+let hVoiceOn=true,hTypeTimer=null,hFull='',hKey=null,hIntroShown=false,hAudio=null;
+function introHelper(){if(hIntroShown)return;hIntroShown=true;showHelper('intro');}
+function hStopVoice(){if(hAudio){hAudio.pause();hAudio.currentTime=0;}if(window.speechSynthesis)window.speechSynthesis.cancel();}
+// голос помощника — настоящий мужской (ElevenLabs): voice/neironov_<key>.mp3 (ру)
+// и voice/neironov_<key>_en.mp3 (англ.); если mp3 не подгрузился — запасной браузерный синтез.
+function hSpeak(key){
+  hStopVoice();if(!hVoiceOn)return;
+  if(!hAudio){hAudio=new Audio();hAudio.volume=.5;}   // голос тише механики: он рядом, а не из громкоговорителя
+  hAudio.src='voice/neironov_'+key+(LANG==='ru'?'':'_en')+'.mp3';
+  hAudio.play().catch(()=>hSpeakTTS((LANG==='ru'?HELP_RU:HELP_EN)[key]));
+}
+function hSpeakTTS(txt){
+  const ss=window.speechSynthesis;if(!ss||!txt)return;ss.cancel();
+  const u=new SpeechSynthesisUtterance(txt.replace(/[«»]/g,''));
+  u.lang=LANG==='ru'?'ru-RU':'en-US';u.pitch=0.8;u.rate=LANG==='ru'?0.97:1.0;u.volume=.5;
+  const vs=ss.getVoices(),pref=vs.find(v=>v.lang&&v.lang.toLowerCase().startsWith(LANG));if(pref)u.voice=pref;
+  ss.speak(u);}
+function showHelper(key){
+  const txt=(LANG==='ru'?HELP_RU:HELP_EN)[key];if(!txt)return;hKey=key;
+  const el=$('hText'),h=$('helper');h.hidden=false;requestAnimationFrame(()=>h.classList.add('up'));
+  clearInterval(hTypeTimer);hFull=txt;let i=0;
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  hTypeTimer=setInterval(()=>{i++;el.innerHTML=esc(hFull.slice(0,i))+'<span class="car">▍</span>';
+    if(i%3===0)SFX.feed();
+    if(i>=hFull.length){clearInterval(hTypeTimer);el.innerHTML=esc(hFull);}},24);
+  hSpeak(key);}
+function hFinishTyping(){if(hTypeTimer){clearInterval(hTypeTimer);hTypeTimer=null;$('hText').innerHTML=hFull.replace(/&/g,'&amp;').replace(/</g,'&lt;');}}
+function closeHelper(){$('helper').classList.remove('up');hStopVoice();
+  clearInterval(hTypeTimer);hTypeTimer=null;setTimeout(()=>{if(!$('helper').classList.contains('up'))$('helper').hidden=true;},550);}
+document.addEventListener('click',e=>{const b=e.target.closest('.hbtn');if(b){SFX.click();
+  let key=b.dataset.help;
+  if(key==='h_net'&&typeof matrixMode!=='undefined'&&matrixMode)key='h_board';   // на виде «числа» — своя справка
+  showHelper(key);}});
+$('hClose').addEventListener('click',()=>{SFX.click();closeHelper();});
+$('hText').addEventListener('click',hFinishTyping);
+$('hVoice').addEventListener('click',()=>{hVoiceOn=!hVoiceOn;$('hVoice').classList.toggle('off',!hVoiceOn);$('hVoice').textContent=hVoiceOn?'🔊':'🔇';
+  if(!hVoiceOn){hStopVoice();}else if(hKey&&$('helper').classList.contains('up'))hSpeak(hKey);});
+if(window.speechSynthesis)window.speechSynthesis.onvoiceschanged=()=>{};   // прогреть список голосов
+
+/* ---------- MNIST decode ---------- */
+function b64ToBytes(b64){const s=atob(b64),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
+function decodeSet(pixB64,labB64,n){const pix=b64ToBytes(pixB64),lab=b64ToBytes(labB64),out=[];
+  for(let i=0;i<n;i++){const x=new Float32Array(784);for(let k=0;k<784;k++)x[k]=pix[i*784+k]/255;const d=lab[i],y=new Float32Array(10);y[d]=1;out.push({x,y,label:d});}
+  return out;}
+const TRAIN=decodeSet(MNIST.trainPix,MNIST.trainLab,MNIST.trainN);
+const TEST=decodeSet(MNIST.testPix,MNIST.testLab,MNIST.testN);
+
+/* ---------- the network ---------- */
+let NET=null;
+function buildNetFromCfg(){NET=makeNet([784,...Array(CFG.layers).fill(CFG.hidden),10]);}
+function evalAcc(){return evaluate(NET,TEST)/TEST.length*100;}
+
+/* ---------- network viz ---------- */
+const netC=$('net'),NW=620,NH=420,nx=fitCanvas(netC,NW,NH);
+const inPt={x:66,y:182};
+const outNodes=Array.from({length:10},(_,i)=>({x:540,y:56+i*(310/9),d:i}));
+let hiddenLayers=[],hid=[],allEdges=[],edgesIn=[],edgesMid=[],nodeR=4,fwdDots=[],bwdDots=[];
+function pickEdge(dir){
+  if(dir<0)return edgesMid[(Math.random()*edgesMid.length)|0];        // назад δ течёт ТОЛЬКО между нейронными слоями
+  return (Math.random()<0.42&&edgesIn.length)                          // вперёд: подмешиваем входные рёбра, чтоб их было видно
+    ?edgesIn[(Math.random()*edgesIn.length)|0]
+    :edgesMid[(Math.random()*edgesMid.length)|0];
+}
+function mkDots(n,dir){return Array.from({length:n},()=>({e:pickEdge(dir),t:Math.random(),sp:0.006+Math.random()*0.01,dir}));}
+function buildViz(){
+  const L=CFG.layers,n=Math.min(CFG.hidden,36);nodeR=n>26?2.4:n>16?3.2:4;hiddenLayers=[];
+  for(let l=0;l<L;l++){const x=L===1?335:210+l*(250/(L-1));hiddenLayers.push(Array.from({length:n},(_,i)=>({x,y:24+i*(372/((n-1)||1))})));}
+  hid=hiddenLayers.flat();allEdges=[];edgesIn=[];edgesMid=[];
+  hiddenLayers[0].forEach(h=>{const e={a:inPt,b:h};allEdges.push(e);edgesIn.push(e);});
+  for(let l=0;l<L-1;l++)hiddenLayers[l].forEach(a=>hiddenLayers[l+1].forEach(b=>{const e={a,b};allEdges.push(e);edgesMid.push(e);}));
+  hiddenLayers[L-1].forEach(h=>outNodes.forEach(o=>{const e={a:h,b:o};allEdges.push(e);edgesMid.push(e);}));
+  fwdDots=[];bwdDots=[];
+}
+function drawNet(tm){
+  nx.clearRect(0,0,NW,NH);
+  const training=S.phase==='training';if(S.recognizeFrames>0)S.recognizeFrames--;
+  const recognizing=S.recognizeFrames>0,fwdActive=training||recognizing,bwdActive=training;
+  const amp=training?0.5:recognizing?0.3:0.05,speed=training?4:1.6,g=Math.min(1,S.acc.length?S.acc[S.acc.length-1].v/100:0);
+  nx.lineWidth=1;
+  allEdges.forEach((e,i)=>{nx.strokeStyle=`rgba(91,224,112,${(fwdActive?0.03:0.018)+(i%9===0?0.02:0)})`;nx.beginPath();nx.moveTo(e.a.x,e.a.y);nx.lineTo(e.b.x,e.b.y);nx.stroke();});
+  const gx0=36,gy0=152,cs=5,GN=12,inG=fwdActive?0.9:0.55;
+  if(S.inputGrid)for(let r=0;r<GN;r++)for(let c=0;c<GN;c++){const v=S.inputGrid[r*GN+c];if(v<0.05)continue;nx.fillStyle=`rgba(91,224,112,${inG*v})`;nx.fillRect(gx0+c*cs,gy0+r*cs,cs-0.7,cs-0.7);}
+  nx.strokeStyle='rgba(91,224,112,.15)';nx.strokeRect(gx0-2,gy0-2,GN*cs+4,GN*cs+4);
+  function stepDot(d,color){d.t+=d.sp*(training?2.3:1);
+    if(d.t>1){d.t=0;d.e=pickEdge(d.dir);}
+    if(!d.e)return;const a=d.dir>0?d.e.a:d.e.b,b=d.dir>0?d.e.b:d.e.a,x=a.x+(b.x-a.x)*d.t,y=a.y+(b.y-a.y)*d.t;
+    nx.beginPath();nx.arc(x,y,2.4,0,7);nx.fillStyle=color;nx.shadowColor=color;nx.shadowBlur=9;nx.fill();nx.shadowBlur=0;}
+  if(fwdActive){if(!fwdDots.length)fwdDots=mkDots(recognizing&&!training?14:24,1);fwdDots.forEach(d=>stepDot(d,'#5be070'));}else if(fwdDots.length)fwdDots=[];
+  if(bwdActive){if(!bwdDots.length)bwdDots=mkDots(18,-1);bwdDots.forEach(d=>stepDot(d,'#e2503a'));}else if(bwdDots.length)bwdDots=[];
+  if(training){ // веса ВХОДНОГО слоя обновляются НА МЕСТЕ (δ·пиксель, без потока) — рёбра мерцают красным
+    for(let k=0;k<7;k++){const e=edgesIn[(Math.random()*edgesIn.length)|0];if(!e)break;
+      nx.strokeStyle=`rgba(226,80,58,${0.05+Math.random()*0.14})`;nx.lineWidth=1;
+      nx.beginPath();nx.moveTo(e.a.x,e.a.y);nx.lineTo(e.b.x,e.b.y);nx.stroke();}
+  }
+  hid.forEach((h,i)=>{const pulse=0.35+amp*Math.abs(Math.sin(tm*0.002*speed+i*0.7));nx.beginPath();nx.arc(h.x,h.y,nodeR,0,7);nx.fillStyle=`rgba(91,224,112,${pulse})`;nx.shadowColor='#5be070';nx.shadowBlur=training?6:(recognizing?4:2);nx.fill();nx.shadowBlur=0;});
+  const fT=S.finaleT?tm-S.finaleT:Infinity;              // финал: бегущий огонь по лампам
+  outNodes.forEach((o,i)=>{
+    const finOn=S.finaleMode==='mini'
+      ?(fT<1150?i===(((fT/95)|0)%10):false)
+      :(fT<4300?i===(((fT/95)|0)%10):(fT<7200?Math.sin(tm*0.014)>0:false));
+    const win=finOn||((S.drawn||training)&&i===S.target),act=S.phase==='untrained'&&!S.drawn?0.3:(win?0.55+0.45*g:0.28);
+    nx.beginPath();nx.arc(o.x,o.y,8,0,7);nx.fillStyle=win?`rgba(255,181,36,${0.5+0.4*g})`:`rgba(91,224,112,${act})`;nx.shadowColor=win?'#ffb524':'#5be070';nx.shadowBlur=win?12:4;nx.fill();nx.shadowBlur=0;
+    nx.fillStyle='#c8e6cd';nx.font='700 11px ui-monospace,monospace';nx.textAlign='left';nx.textBaseline='middle';nx.fillText(i,o.x+14,o.y);});
+}
+function vizLoop(tm){
+  if(matrixMode){if(tm-boardLast>120){boardLast=tm;boardDraw();}}
+  else drawNet(tm);
+  if(running)filmTick(Math.min(60,tm-filmLast));filmLast=tm;requestAnimationFrame(vizLoop);}
+requestAnimationFrame(vizLoop);   // старт после инициализации скрипта — running уже объявлен
+
+/* ---------- доска чисел: вся сеть цифрами, пан как по карте ---------- */
+let matrixMode=false,boardLast=0;
+const bCv=$('wboard'),bCtx=bCv.getContext('2d');
+const B_CW=56,B_CH=20,B_GAP=54,B_SUP=['¹','²','³','⁴'];
+let bPx=0,bPy=0,bW=0,bH=0,bSig='';
+const bLastVal=new Map();   // прежнее значение ячейки — вспышка по фактической дельте
+const bFlash=new Map();     // k -> {t, dir}: когда и куда крутнуло
+const bFmt=v=>(v<0?'−':'+')+Math.abs(v).toFixed(4);
+function boardBlocks(){
+  const bl=[];let y=30;
+  for(let l=0;l<NET.W.length;l++){
+    const outN=NET.W[l].length,inN=NET.W[l][0].length,s=B_SUP[l]||l+1;
+    const nm=LANG==='ru'?`СЛОЙ ${l+1} · МАТРИЦА W${s} · ${outN}×${inN}`:`LAYER ${l+1} · MATRIX W${s} · ${outN}×${inN}`;
+    bl.push({tag:'W'+s,name:nm,cols:inN,rows:outN,y,amber:l===NET.W.length-1,get:(c,r)=>NET.W[l][r][c]});
+    y+=outN*B_CH+B_GAP;
+    const bn=LANG==='ru'?`СМЕЩЕНИЯ b${s} · ${outN} ШТ`:`BIASES b${s} · ${outN}`;
+    bl.push({tag:'b'+s,name:bn,cols:outN,rows:1,y,amber:l===NET.W.length-1,get:(c,r)=>NET.B[l][c]});
+    y+=B_CH+B_GAP;
+  }
+  const worldW=Math.max(...bl.map(b=>b.cols))*B_CW;
+  for(const b of bl)b.x=((worldW-b.cols*B_CW)/2/B_CW|0)*B_CW;   // узкие блоки — по центру мира, кратно ячейке
+  return {bl,worldW,worldH:y};
+}
+function boardResize(){const d=window.devicePixelRatio||1;bW=bCv.clientWidth;bH=bCv.clientHeight;
+  bCv.width=bW*d;bCv.height=bH*d;bCtx.setTransform(d,0,0,d,0,0);}
+let bAlive=null;   // какие столбцы входа вообще живут (пиксель хоть раз не пуст)
+function computeAlive(){bAlive=new Uint8Array(784);
+  for(let i=0;i<1200;i++){const x=TRAIN[(i*41)%TRAIN.length].x;
+    for(let k=0;k<784;k++)if(x[k]>.02)bAlive[k]=1;}}
+let bZoom=1;const bImgCache=new Map();
+function zoomAt(f,sx,sy){ // зум к точке экрана: мировая точка под курсором остаётся на месте
+  const wx=bPx+sx/bZoom,wy=bPy+sy/bZoom;
+  bZoom=Math.max(.012,Math.min(1.6,bZoom*f));
+  bPx=wx-sx/bZoom;bPy=wy-sy/bZoom;boardDraw();}
+function boardFit(){ // обзор: вся сеть по высоте, по центру ширины
+  const g=boardBlocks();bZoom=Math.min(1,(bH-24)/g.worldH);
+  bPx=g.worldW/2-bW/(2*bZoom);bPy=-12;boardDraw();}
+function boardDraw(){
+  if(!bW)boardResize();
+  if(!bAlive)computeAlive();
+  const {bl,worldW,worldH}=boardBlocks();
+  const sig=NET.sizes.join('x');
+  if(sig!==bSig){bSig=sig;bLastVal.clear();bFlash.clear();bImgCache.clear();bZoom=1;
+    bPx=390*B_CW-bW/2;bPy=0;}   // старт — в живую середину W¹, а не в мёртвый угол рамки
+  const iz=1/bZoom,vwW=bW*iz,vhW=bH*iz;
+  bPx=worldW<vwW?(worldW-vwW)/2:Math.max(-50*iz,Math.min(worldW-vwW+50*iz,bPx));
+  bPy=worldH<vhW?(worldH-vhW)/2:Math.max(-30*iz,Math.min(worldH-vhW+50*iz,bPy));
+  const now=performance.now(),cellW=B_CW*bZoom,cellH=B_CH*bZoom;
+  const mode=cellW>=34?'txt':cellW>=3?'rect':'img';   // числа → клетки → карта
+  bCtx.fillStyle='#07130c';bCtx.fillRect(0,0,bW,bH);bCtx.textBaseline='middle';
+  for(const b of bl){
+    const bh=b.rows*B_CH;
+    if(b.y+bh<bPy||b.y>bPy+vhW)continue;
+    const sx=(b.x-bPx)*bZoom,sy=(b.y-bPy)*bZoom;
+    bCtx.strokeStyle='#1e3a28';bCtx.lineWidth=1;bCtx.strokeRect(sx+.5,sy+.5,b.cols*cellW,bh*bZoom);
+    if(mode==='img'){ // совсем далеко: блок как тепловая карта из ImageData
+      let off=bImgCache.get(b.tag);
+      if(!off||off.width!==b.cols||off.height!==b.rows){off=document.createElement('canvas');off.width=b.cols;off.height=b.rows;bImgCache.set(b.tag,off);}
+      const ox=off.getContext('2d'),im=ox.createImageData(b.cols,b.rows);
+      for(let r=0;r<b.rows;r++)for(let c=0;c<b.cols;c++){const v=b.get(c,r),o=(r*b.cols+c)*4,m=Math.min(1,Math.abs(v)/.9);
+        if(v>=0){im.data[o]=16;im.data[o+1]=36+m*205;im.data[o+2]=28;}else{im.data[o]=36+m*205;im.data[o+1]=26;im.data[o+2]=22;}im.data[o+3]=255;}
+      ox.putImageData(im,0,0);
+      bCtx.imageSmoothingEnabled=false;
+      bCtx.drawImage(off,sx,sy,b.cols*cellW,bh*bZoom);
+    }else{
+      const c0=Math.max(0,((bPx-b.x)/B_CW)|0),c1=Math.min(b.cols-1,((bPx-b.x+vwW)/B_CW)|0);
+      const r0=Math.max(0,((bPy-b.y)/B_CH)|0),r1=Math.min(b.rows-1,((bPy-b.y+vhW)/B_CH)|0);
+      if(mode==='txt')bCtx.font=Math.max(7,Math.round(11*bZoom))+'px Menlo,monospace';
+      for(let r=r0;r<=r1;r++)for(let c=c0;c<=c1;c++){
+        const v=b.get(c,r),k=b.tag+':'+c+':'+r;
+        const prev=bLastVal.get(k);
+        if(prev!==undefined&&Math.abs(v-prev)>1e-5)bFlash.set(k,{t:now,dir:v>prev?1:-1});   // вес реально крутнуло (один батч ~1e-4)
+        bLastVal.set(k,v);
+        const f=bFlash.get(k),hot=f&&now-f.t<420,dead=b.tag==='W¹'&&bAlive&&!bAlive[c];
+        const X=(b.x+c*B_CW-bPx)*bZoom,Y=(b.y+r*B_CH-bPy)*bZoom;
+        if(mode==='txt'){
+          bCtx.fillStyle=hot?(f.dir>0?'#a6ff9e':'#ff8a5e')    // в плюс — зелёная вспышка, в минус — красная
+            :dead?'#20402a'                                    // мёртвый столбец: пиксель входа всегда пуст
+            :(v<0?'#3f9a52':'#5be070');
+          bCtx.fillText(bFmt(v),X+4*bZoom,Y+cellH/2);
+        }else{ // клетки: цвет = знак, яркость = величина
+          const m=Math.min(1,Math.abs(v)/.9);
+          bCtx.fillStyle=hot?(f.dir>0?'#a6ff9e':'#ff8a5e')
+            :dead?'#132b1a'
+            :v>=0?`rgb(16,${36+m*205|0},28)`:`rgb(${36+m*205|0},26,22)`;
+          bCtx.fillRect(X+.5,Y+.5,Math.max(1,cellW-1),Math.max(1,cellH-1));
+        }
+      }
+      /* липкие адреса — только там, где читаются числа */
+      if(mode==='txt'&&b.rows>1&&r1>=r0){
+        bCtx.fillStyle='#07130cdd';bCtx.fillRect(0,bH-15,bW,15);
+        bCtx.fillStyle='#2c6e3a';bCtx.font='9px Menlo,monospace';
+        for(let c=c0;c<=c1;c+=4)bCtx.fillText('c'+c,(b.x+c*B_CW-bPx)*bZoom+4,bH-7);
+        bCtx.fillStyle='#07130cdd';bCtx.fillRect(0,0,42,bH);
+        bCtx.fillStyle='#2c6e3a';
+        for(let r=r0;r<=r1;r++)bCtx.fillText(b.tag+'['+r+']',3,(b.y+r*B_CH-bPy)*bZoom+cellH/2);
+      }
+    }
+    /* липкий заголовок блока — всегда экранного размера */
+    bCtx.font='700 10px Menlo,monospace';bCtx.fillStyle=b.amber?'#ffb524':'#5be070';
+    bCtx.fillText(b.name,Math.max(sx,46),Math.min(Math.max(sy-19,4),sy+bh*bZoom-8)+6);
+  }
+  if(bFlash.size>6000)bFlash.clear();
+  /* HUD: адрес ячейки в центре экрана + текущий зум */
+  const cx=bPx+vwW/2,cy=bPy+vhW/2;let loc='—';
+  for(const b of bl)if(cy>=b.y&&cy<b.y+b.rows*B_CH){const c=((cx-b.x)/B_CW)|0,r=((cy-b.y)/B_CH)|0;
+    if(c>=0&&c<b.cols)loc=b.tag+'['+(b.rows>1?r+','+c:c)+']';}
+  $('boardHud').textContent=(LANG==='ru'?'ЦЕНТР: ':'CENTER: ')+loc+' · ×'+bZoom.toFixed(2);
+}
+let bDrag=false,bLx=0,bLy=0;
+bCv.addEventListener('pointerdown',e=>{bDrag=true;bLx=e.clientX;bLy=e.clientY;bCv.classList.add('drag');bCv.setPointerCapture(e.pointerId);});
+bCv.addEventListener('pointermove',e=>{if(!bDrag)return;bPx-=(e.clientX-bLx)/bZoom;bPy-=(e.clientY-bLy)/bZoom;bLx=e.clientX;bLy=e.clientY;boardDraw();});
+bCv.addEventListener('pointerup',()=>{bDrag=false;bCv.classList.remove('drag');});
+bCv.addEventListener('wheel',e=>{e.preventDefault();
+  if(e.ctrlKey){const r=bCv.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*.01),e.clientX-r.left,e.clientY-r.top);}   // пинч/ctrl+колесо = зум к курсору
+  else{bPx+=e.deltaX/bZoom;bPy+=e.deltaY/bZoom;boardDraw();}},{passive:false});
+$('bzIn').addEventListener('click',()=>{SFX.click();zoomAt(1.5,bW/2,bH/2);});
+$('bzOut').addEventListener('click',()=>{SFX.click();zoomAt(1/1.5,bW/2,bH/2);});
+$('bzFit').addEventListener('click',()=>{SFX.click();boardFit();});
+window.addEventListener('resize',()=>{if(matrixMode){boardResize();boardDraw();}});
+function setView(matrix){
+  matrixMode=matrix;
+  $('boardwrap').hidden=!matrix;$('netwrap').style.display=matrix?'none':'';
+  $('vtScheme').classList.toggle('on',!matrix);$('vtMatrix').classList.toggle('on',matrix);
+  $('viewSw').classList.toggle('r',matrix);
+  if(matrix){boardResize();boardDraw();}
+}
+$('viewSw').addEventListener('click',()=>{SFX.click();setView(!matrixMode);});
+
+/* ---------- outputs ---------- */
+const obars=$('obars');
+for(let i=0;i<10;i++)obars.insertAdjacentHTML('beforeend',`<div class="ob" id="ob${i}"><span class="d">${i}</span><span class="track"><i id="obi${i}"></i></span><span class="pv" id="obp${i}">0%</span></div>`);
+function renderOutputs(a,feedLabel){
+  const top=a?argmax(a):-1,show=!!a&&(S.drawn||feedLabel!=null);
+  for(let i=0;i<10;i++){const v=a?a[i]:0.05;$('obi'+i).style.width=Math.min(100,v*100).toFixed(0)+'%';$('obp'+i).textContent=Math.min(100,v*100).toFixed(0)+'%';$('ob'+i).classList.toggle('win',show&&i===top);}
+  const guess=$('guess'),mark=$('guessMark');
+  if(show){guess.classList.remove('unsure');$('guessBig').textContent=top;if(feedLabel==null)S.target=top;}
+  else{guess.classList.add('unsure');$('guessBig').textContent='0';}
+  if(feedLabel!=null&&show){mark.hidden=false;const ok=top===feedLabel;mark.textContent=ok?'✓':'✗';mark.className='gmark '+(ok?'ok':'no');}
+  else mark.hidden=true;
+}
+
+/* ---------- charts ---------- */
+function lineChart(el,pts,color,sc,fmt){   // pts: [{x: эпоха (дробная), v}]; sc:{min,max,log?}
+  const W=240,H=104,L=28,R=8,T=10,B=16,n=pts.length,mx=Math.max(1,CFG.epochs);
+  const X=x=>L+x*(W-L-R)/mx;
+  const Y=sc.log
+    ?v=>{const c=Math.max(sc.min,Math.min(sc.max,v));return T+(1-Math.log(c/sc.min)/Math.log(sc.max/sc.min))*(H-T-B);}
+    :v=>T+(1-Math.max(0,Math.min(sc.max,v))/sc.max)*(H-T-B);
+  let s=`<svg viewBox="0 0 ${W} ${H}">`;
+  const gstep=Math.max(1,Math.round(CFG.epochs/6));
+  for(let gx=0;gx<=CFG.epochs;gx+=gstep)s+=`<line x1="${X(gx)}" y1="${T}" x2="${X(gx)}" y2="${H-B}" stroke="${color}22"/>`;
+  const gys=sc.log?[3,1,.3,.1,.03]:[0,sc.max/2,sc.max];   // log: декадные метки
+  for(const gy of gys){s+=`<line x1="${L}" y1="${Y(gy)}" x2="${W-R}" y2="${Y(gy)}" stroke="${color}22"/><text x="${L-4}" y="${Y(gy)+3}" text-anchor="end" font-size="7" fill="${color}88" font-family="monospace">${fmt(gy)}</text>`;}
+  let P=pts;                                            // прореживание: не больше ~600 точек
+  if(P.length>600){const st=Math.ceil(P.length/600);P=P.filter((_,i)=>i%st===0);if(P[P.length-1]!==pts[n-1])P.push(pts[n-1]);}
+  if(P.length>1)s+=`<polyline points="${P.map(p=>X(p.x).toFixed(1)+','+Y(p.v).toFixed(1)).join(' ')}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" style="filter:drop-shadow(0 0 3px ${color})"/>`;
+  if(n)s+=`<circle cx="${X(pts[n-1].x)}" cy="${Y(pts[n-1].v)}" r="3" fill="${color}" style="filter:drop-shadow(0 0 4px ${color})"/>`;
+  el.innerHTML=s+'</svg>';}
+function renderCharts(){
+  lineChart($('lossChart'),S.loss,'#ffb524',{log:true,min:.02,max:3},v=>v>=1?v.toFixed(0):v.toFixed(2));}
+
+/* ---------- hidden gallery = real W[0] weights ---------- */
+let tiles=[];
+function rebuildTiles(){const el=$('tiles');el.innerHTML='';tiles=[];const n=Math.min(CFG.hidden,50);
+  for(let i=0;i<n;i++){const c=document.createElement('canvas');c.width=28;c.height=28;el.appendChild(c);tiles.push(c.getContext('2d'));}
+  $('galPlate').textContent=t('gal')(CFG.hidden,CFG.hidden>50);renderTiles();}
+function renderTiles(){
+  tiles.forEach((ctx,idx)=>{const img=ctx.createImageData(28,28);
+    if(NET&&NET.W[0][idx]){const w=NET.W[0][idx];let mx=1e-6;for(let k=0;k<784;k++)mx=Math.max(mx,Math.abs(w[k]));
+      for(let k=0;k<784;k++){const val=w[k]/mx,o=k*4;if(val>0){img.data[o]=91;img.data[o+1]=224;img.data[o+2]=112;img.data[o+3]=val*255;}else{img.data[o]=226;img.data[o+1]=80;img.data[o+2]=58;img.data[o+3]=-val*200;}}}
+    ctx.putImageData(img,0,0);});}
+
+/* ---------- example thumb + input square ---------- */
+const exCtx=$('exThumb').getContext('2d');
+function vec784ToGrid(x){const g=new Float32Array(144);for(let r=0;r<12;r++)for(let c=0;c<12;c++){let s=0,nn=0;const r0=(r*28/12)|0,r1=((r+1)*28/12)|0,c0=(c*28/12)|0,c1=((c+1)*28/12)|0;for(let y=r0;y<r1;y++)for(let x2=c0;x2<c1;x2++){s+=x[y*28+x2];nn++;}g[r*12+c]=nn?s/nn:0;}return g;}
+function showExample(sm){S.exLabel=sm.label;S.target=sm.label;S.inputGrid=vec784ToGrid(sm.x);
+  const im=exCtx.createImageData(28,28);for(let k=0;k<784;k++){const gg=sm.x[k]*255,o=k*4;im.data[o]=gg*0.4;im.data[o+1]=gg;im.data[o+2]=gg*0.5;im.data[o+3]=255;}exCtx.putImageData(im,0,0);
+  $('exLbl').textContent=t('label')+' '+sm.label;}
+
+/* ---------- draw pad ---------- */
+const pad=$('pad'),pctx=fitCanvas(pad,224,224);
+const sc=document.createElement('canvas');sc.width=28;sc.height=28;const sctx=sc.getContext('2d');
+function clearPad(){pctx.fillStyle='#07130c';pctx.fillRect(0,0,224,224);}
+clearPad();
+function drawSampleOnPad(sm){clearPad();
+  pctx.fillStyle='#8fe6a0';pctx.shadowColor='#5be070';pctx.shadowBlur=4;
+  for(let r=0;r<28;r++)for(let c=0;c<28;c++){const v=sm.x[r*28+c];if(v>0.15){pctx.globalAlpha=Math.min(1,v);pctx.fillRect(c*8,r*8,8,8);}}
+  pctx.globalAlpha=1;pctx.shadowBlur=0;}
+function padToInput(){
+  // MNIST-стиль: обрезать по габаритам → вписать в бокс 20×20 → центр масс в центр 28×28.
+  const P=pad.width;                                     // физические пиксели (с учётом DPR)
+  const im=pctx.getImageData(0,0,P,P).data;
+  let minX=P,minY=P,maxX=-1,maxY=-1;
+  for(let y=0;y<P;y+=2)for(let x=0;x<P;x+=2){if(im[(y*P+x)*4+1]>40){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}}
+  if(maxX<0){S.inputVec=null;S.inputGrid=new Float32Array(144);return;}
+  const w=maxX-minX+1,h=maxY-minY+1,s=20/Math.max(w,h),w2=Math.max(1,Math.round(w*s)),h2=Math.max(1,Math.round(h*s));
+  sctx.setTransform(1,0,0,1,0,0);sctx.fillStyle='#000';sctx.fillRect(0,0,28,28);
+  sctx.imageSmoothingEnabled=true;
+  sctx.drawImage(pad,minX,minY,w,h,(28-w2)/2,(28-h2)/2,w2,h2);
+  let d=sctx.getImageData(0,0,28,28).data,sx=0,sy=0,tot=0;
+  for(let y=0;y<28;y++)for(let x=0;x<28;x++){const v=d[(y*28+x)*4+1];sx+=x*v;sy+=y*v;tot+=v;}
+  if(tot>0){const dx=Math.round(13.5-sx/tot),dy=Math.round(13.5-sy/tot);
+    if(dx||dy){const c2=document.createElement('canvas');c2.width=28;c2.height=28;
+      c2.getContext('2d').drawImage(sc,dx,dy);
+      sctx.fillStyle='#000';sctx.fillRect(0,0,28,28);sctx.drawImage(c2,0,0);
+      d=sctx.getImageData(0,0,28,28).data;}}
+  const v=new Float64Array(784);
+  for(let i=0;i<784;i++){const g=d[i*4+1];v[i]=Math.max(0,(g-20)/215);}
+  S.inputVec=v;S.inputGrid=vec784ToGrid(v);S.drawn=true;}
+function recognize(){if(!S.inputVec||!NET)return;renderOutputs(forward(NET,S.inputVec,false));SFX.ping();S.recognizeFrames=120;}
+let drawing=false;
+function padPos(e){const r=pad.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*224,y:(e.clientY-r.top)/r.height*224};}
+function padGridQuick(){sctx.setTransform(1,0,0,1,0,0);sctx.fillStyle='#000';sctx.fillRect(0,0,28,28);sctx.drawImage(pad,0,0,28,28);
+  const im=sctx.getImageData(0,0,28,28).data,v=new Float32Array(784);for(let i=0;i<784;i++)v[i]=Math.max(0,(im[i*4+1]-25)/210);
+  S.inputGrid=vec784ToGrid(v);}
+function paint(e){const p=padPos(e);pctx.fillStyle='#8fe6a0';pctx.shadowColor='#5be070';pctx.shadowBlur=8;pctx.beginPath();pctx.arc(p.x,p.y,11,0,7);pctx.fill();pctx.shadowBlur=0;S.drawn=true;S.recognizeFrames=40;padGridQuick();}
+pad.addEventListener('pointerdown',e=>{if(running)return;clearFinale();drawing=true;SFX.click();paint(e);});
+pad.addEventListener('pointermove',e=>{if(drawing)paint(e);});
+window.addEventListener('pointerup',()=>{if(drawing){drawing=false;padToInput();recognize();}});
+$('clearPad').addEventListener('click',()=>{SFX.click();clearPad();S.drawn=false;S.inputVec=null;S.inputGrid=new Float32Array(144);renderOutputs(null);});
+$('randPad').addEventListener('click',()=>{SFX.click();clearFinale();const sm=TEST[(Math.random()*TEST.length)|0];drawSampleOnPad(sm);
+  S.inputVec=sm.x.slice();S.inputGrid=vec784ToGrid(sm.x);S.drawn=true;recognize();});
+
+/* ---------- training (chunked, real) ---------- */
+let running=false,order=null,bi=0,epochTarget=0;
+function shuffleOrder(){order=[...Array(TRAIN.length).keys()];for(let i=order.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[order[i],order[j]]=[order[j],order[i]];}}
+function setPhase(p){S.phase=p;const el=$('phase');el.className='lamp '+(p==='untrained'?'wait':p==='training'?'train':'done');
+  $('phaseTxt').textContent=t(p==='untrained'?'ph_wait':p==='training'?(S.diverge?'ph_diverge':'ph_train'):'ph_done');}
+function trainDisabled(on){['ep1','ep30','reset','cHid','cEta','cBat','cEp','clearPad','randPad'].forEach(id=>$(id).disabled=on);$('cLay').style.pointerEvents=on?'none':'';}
+function measureAcc(xEpoch){ // замер ТОЧНОСТИ на контрольной подвыборке (лосс идёт с батчей бесплатно)
+  let ok=0;const N=250;
+  for(let i=0;i<N;i++){const sm=TEST[(Math.random()*TEST.length)|0];
+    if(argmax(forward(NET,sm.x,false))===sm.label)ok++;}
+  const acc=100*ok/N;
+  S.acc.push({x:xEpoch,v:acc});
+  $('lossV').textContent=S.lossEma.toFixed(2);$('accV').textContent=acc.toFixed(0);setGauge(acc);
+  renderCharts();}
+function trainLossQuick(){ // стартовая точка лосса: средний промах на 100 обучающих
+  let s=0;for(let i=0;i<100;i++){const sm=TRAIN[(Math.random()*TRAIN.length)|0],a=forward(NET,sm.x,false);
+    let q=0;for(let k=0;k<10;k++){const d=sm.y[k]-a[k];q+=d*d;}s+=0.5*q;}
+  return s/100;}
+function runEpochs(target){
+  if(running)return;clearFinale();epochTarget=target;running=true;setPhase('training');humOn();SFX.clunk();SFX.spinUp();trainDisabled(true);
+  startFilmFlow();
+  $('padPlate').textContent=t('p_input_feed');$('padHint').textContent=t('hint_feed');
+  if(!order)shuffleOrder();
+  let lastFeed=0,lastTiles=0;
+  function step(){
+    if(!running){return;}
+    if(S.epoch>=epochTarget){finishTraining();return;}
+    const bpe=Math.ceil(TRAIN.length/CFG.batch),t0=performance.now();
+    while(performance.now()-t0<26&&S.epoch<epochTarget){
+      const start=bi*CFG.batch,batch=[];for(let k=start;k<Math.min(start+CFG.batch,TRAIN.length);k++)batch.push(TRAIN[order[k]]);
+      const bl=updateMiniBatch(NET,batch,CFG.eta);bi++;samplesSeen+=batch.length;
+      S.lossEma=S.lossEma==null?bl:S.lossEma*0.94+bl*0.06;          // сглаживание, как в TensorBoard
+      S.loss.push({x:S.epoch+bi/bpe,v:S.lossEma});                   // ← точка лосса НА КАЖДЫЙ БАТЧ
+      if(bi%Math.max(1,Math.round(bpe/8))===0&&bi<bpe)measureAcc(S.epoch+bi/bpe);
+      if(bi>=bpe){S.epoch++;bi=0;shuffleOrder();
+        const acc=evalAcc();S.acc.push({x:S.epoch,v:acc});S.diverge=S.lossEma>2.2;
+        $('epNum').textContent=S.epoch+'/'+CFG.epochs;$('lossV').textContent=S.lossEma.toFixed(2);$('lossV').style.color=S.diverge?'#e2503a':'';$('accV').textContent=acc.toFixed(0);setGauge(acc);
+        renderCharts();SFX.tick();if(S.diverge)$('phaseTxt').textContent=t('ph_diverge');
+      }
+    }
+    const now=performance.now();
+    if(now-lastFeed>130){lastFeed=now;                     // ЛЕНТА: текущий образец → экран, выход, схема
+      const sm=TRAIN[order[(bi*CFG.batch)%TRAIN.length]];
+      drawSampleOnPad(sm);showExample(sm);
+      renderOutputs(forward(NET,sm.x,false),sm.label);
+      SFX.feed();                                          // телетайп: станция «читает» образцы
+    }
+    if(now-lastTiles>700){lastTiles=now;renderTiles();}    // веса скрытого слоя — на глазах
+    drawMosaic(bi*CFG.batch/TRAIN.length);renderOdo();     // карта фонда + счётчик
+    $('batchNum').textContent=bi+'/'+bpe;
+    requestAnimationFrame(step);
+  }
+  step();
+}
+let protoN=0,cerT=[];
+/* ритуал этапа: табельная карта выезжает из щели, компостер пробивает отметку */
+function tcardShow(){
+  const c=$('tcard'),hl=$('tcHoles');
+  $('tcHead').textContent=LANG==='ru'?'ТАБЕЛЬ ИСПЫТАНИЙ · «МНИСТ-1»':'TEST TIME-CARD · «MNIST-1»';
+  $('tcStage').textContent=(LANG==='ru'?'ЭТАП ':'STAGE ')+S.epoch+(LANG==='ru'?' из ':' of ')+CFG.epochs;
+  const a=S.acc.length?S.acc[S.acc.length-1].v:0;
+  $('tcAcc').textContent=(LANG==='ru'?'точность ':'accuracy ')+a.toFixed(1)+'%';
+  $('tcStamp').textContent=(LANG==='ru'?'ЭТАП ':'STAGE ')+S.epoch;
+  const n=Math.min(12,CFG.epochs),done=Math.max(1,Math.round(S.epoch/CFG.epochs*n));
+  hl.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('i');if(i<done-1)d.className='hit';hl.appendChild(d);}
+  c.classList.remove('away','stamped','jolt');c.hidden=false;
+  requestAnimationFrame(()=>c.classList.add('up'));
+  SFX.slide();                                                       // карта выезжает из щели
+  const T=(ms,f)=>cerT.push(setTimeout(f,ms));
+  T(560,()=>{c.classList.add('jolt','stamped');SFX.punch();          // удар компостера: дырка + штамп
+    const last=hl.children[done-1];if(last)last.classList.add('hit');});
+  T(2700,()=>{c.classList.remove('up');c.classList.add('away');});   // карту забирает механизм
+  T(3300,()=>{c.hidden=true;});
+}
+function clearFinale(){S.finaleT=0;cerT.forEach(clearTimeout);cerT=[];
+  $('paper').classList.remove('up');$('pstamp').classList.remove('slam');
+  $('tcard').classList.remove('up','away','stamped','jolt');$('tcard').hidden=true;
+  document.querySelector('.stage .panel').classList.remove('invite');}
+function finishTraining(){
+  running=false;setPhase('done');trainDisabled(false);
+  $('padPlate').textContent=t('p_input');
+  clearPad();S.drawn=false;S.inputVec=null;S.inputGrid=new Float32Array(144);renderOutputs(null);
+  renderTiles();drawMosaic(1);renderOdo();filmQ=[];renderFilm();
+  if(S.epoch<CFG.epochs){ // ручной этап: короткая отбивка без бумаги
+    humOff();SFX.done();$('padHint').textContent=t('hint_draw');
+    S.finaleT=performance.now();S.finaleMode='mini';
+    tcardShow();
+    return;}
+  S.finaleMode='full';
+  if(matrixMode)setView(false);   // церемония печатается на ЭЛТ схемы — вернём её на экран
+  /* ═══ ЦЕРЕМОНИЯ ПРИЁМКИ ═══
+     гудок + глушение машины → бумага из щели → построчная печать →
+     звонок каретки → ШТАМП с ударом → приглашение к испытанию      */
+  humGlideOff();SFX.horn();
+  $('padHint').textContent=t('hint_test');
+  S.finaleT=performance.now();protoN++;
+  const acc=(S.acc[S.acc.length-1]||{v:0}).v,loss=(S.loss[S.loss.length-1]||{v:0}).v;
+  const w=NET.sizes.reduce((s,_,i)=>i<NET.sizes.length-1?s+NET.sizes[i]*NET.sizes[i+1]+NET.sizes[i+1]:s,0);
+  const rows=[{txt:t('proto_hdr')(protoN),cls:'hdr'},{txt:t('sep'),cls:'hdr'},
+    ...t('proto')(S.epoch,samplesSeen,w,loss,acc).map(x=>({txt:x})),
+    {txt:t('sep'),cls:'hdr'},{txt:t('verd_line')(t('verd')(acc)),cls:'verd'}];
+  $('paperLines').innerHTML=rows.map(r=>`<div class="pline ${r.cls||''}">${r.txt}</div>`).join('');
+  $('pstamp').innerHTML=t('stampw')(acc);
+  const T=(ms,f)=>cerT.push(setTimeout(f,ms));
+  T(700,()=>{SFX.slide();$('paper').classList.add('up');});
+  const lines=[...$('paperLines').children];
+  lines.forEach((el,i)=>T(1650+i*300,()=>{el.classList.add('on');SFX.print();}));
+  const tEnd=1650+lines.length*300;
+  T(tEnd+150,()=>SFX.bell());
+  T(tEnd+620,()=>{$('pstamp').classList.add('slam');SFX.stamp();
+    const np=document.querySelector('.netpanel');np.classList.add('shake');setTimeout(()=>np.classList.remove('shake'),340);});
+  T(tEnd+1350,()=>document.querySelector('.stage .panel').classList.add('invite'));
+}
+function resetTraining(){running=false;clearFinale();filmQ=[];renderFilm();S.epoch=0;S.diverge=false;bi=0;order=null;buildNetFromCfg();
+  S.loss=[{x:0,v:trainLossQuick()}];S.acc=[{x:0,v:evaluate(NET,TEST.slice(0,300))/300*100}];   // базовая точка «до обучения»
+  S.lossEma=S.loss[0].v;
+  setPhase('untrained');
+  $('padPlate').textContent=t('p_input');$('padHint').textContent=t('hint_draw');
+  $('epNum').textContent='0/'+CFG.epochs;$('batchNum').textContent='—';$('lossV').textContent=S.loss[0].v.toFixed(2);$('lossV').style.color='';$('accV').textContent=S.acc[0].v.toFixed(0);setGauge(S.acc[0].v);$('exLbl').textContent='—';S.exLabel=null;
+  exCtx.clearRect(0,0,28,28);renderCharts();rebuildTiles();
+  samplesSeen=0;if(moBase){drawMosaic(0);renderOdo();}
+  if(S.drawn&&S.inputVec)renderOutputs(forward(NET,S.inputVec,false));else renderOutputs(null);trainDisabled(false);}
+$('ep1').addEventListener('click',()=>{if(running||S.epoch>=CFG.epochs)return;runEpochs(S.epoch+1);});
+$('ep30').addEventListener('click',()=>{if(running||S.epoch>=CFG.epochs)return;runEpochs(CFG.epochs);});
+$('reset').addEventListener('click',()=>{SFX.power();humOff();resetTraining();
+  setTimeout(()=>{$('resetGuard').classList.remove('open');SFX.coverDown();},700);});   // крышка сама ложится после сброса
+/* глухой «тук» на нажатие толстых клавиш */
+document.querySelectorAll('.bigbtn').forEach(b=>b.addEventListener('pointerdown',()=>{if(!b.disabled)SFX.key();}));
+/* защитная крышка сброса: клик — откинуть, клик мимо — закрыть */
+$('resetCover').addEventListener('click',e=>{e.stopPropagation();$('resetGuard').classList.add('open');SFX.coverUp();});
+document.addEventListener('click',e=>{const g=$('resetGuard');
+  if(g.classList.contains('open')&&!g.contains(e.target)){g.classList.remove('open');SFX.coverDown();}});
+
+/* ---------- config ---------- */
+function applyConfig(){$('cHidV').textContent=CFG.hidden;$('cEtaV').textContent=CFG.eta.toFixed(1);$('cBatV').textContent=CFG.batch;$('cEpV').textContent=CFG.epochs;$('cLayV').textContent=CFG.layers;
+  $('midLabel').textContent=t('hidden')+'·'+CFG.hidden+(CFG.layers>1?'×'+CFG.layers:'');buildViz();resetTraining();}
+$('cHid').addEventListener('input',e=>{cfgTick();CFG.hidden=+e.target.value;applyConfig();});
+$('cEta').addEventListener('input',e=>{cfgTick();CFG.eta=+e.target.value;applyConfig();});
+$('cBat').addEventListener('input',e=>{cfgTick();CFG.batch=+e.target.value;applyConfig();});
+$('cEp').addEventListener('input',e=>{cfgTick();CFG.epochs=+e.target.value;$('cEpV').textContent=CFG.epochs;$('epNum').textContent=S.epoch+'/'+CFG.epochs;renderCharts();});
+$('cLay').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SFX.clunk();CFG.layers=+b.dataset.v;[...$('cLay').children].forEach(x=>x.classList.toggle('on',x===b));applyConfig();});
+$('mute').addEventListener('click',()=>{muted=!muted;$('mute').textContent=(muted?'🔇 ':'🔊 ')+t('sound');$('mute').classList.toggle('off',muted);
+  if(muted)humOff();else{SFX.click();if(running)humOn();}});
+$('langbtn').addEventListener('click',()=>{SFX.click();setLang(LANG==='ru'?'en':'ru');});
+
+/* ---------- стрелочный прибор ---------- */
+let needleEl=null;
+function buildGauge(){
+  const cx=50,cy=64,rT=45,rt=40,rL=33;
+  const pt=(ang,r)=>{const a=(ang-90)*Math.PI/180;return[(cx+r*Math.cos(a)).toFixed(1),(cy+r*Math.sin(a)).toFixed(1)];};
+  let ticks='';
+  for(let p=0;p<=100;p+=5){
+    const ang=-60+p*1.2,major=p%25===0,[x1,y1]=pt(ang,rT),[x2,y2]=pt(ang,major?rt-3:rt);
+    ticks+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2a2a20" stroke-width="${major?1.4:0.7}"/>`;
+    if(major){const[lx,ly]=pt(ang,rL);ticks+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#3a382c" font-family="Arial">${p}</text>`;}
+  }
+  const[ax1,ay1]=pt(-60,rT+1),[ax2,ay2]=pt(-60+20*1.2,rT+1);
+  const red=`<path d="M ${ax1} ${ay1} A ${rT+1} ${rT+1} 0 0 1 ${ax2} ${ay2}" fill="none" stroke="#a83a2a" stroke-width="2.6" opacity=".8"/>`;
+  $('gauge').innerHTML=`<svg viewBox="0 0 100 80">
+    ${red}${ticks}
+    <text x="50" y="52" text-anchor="middle" font-size="7.5" fill="#3a382c" font-family="Arial" letter-spacing="1">%</text>
+    <text x="50" y="76" text-anchor="middle" font-size="5" fill="#6b6552" font-family="Arial">ГОСТ · кл. 1,5</text>
+    <g id="needleG" style="transform-origin:50px 64px;transition:transform .8s cubic-bezier(.3,1.5,.45,1)">
+      <line x1="50" y1="64" x2="50" y2="21" stroke="#16150f" stroke-width="1.7"/>
+      <line x1="50" y1="64" x2="50" y2="70" stroke="#16150f" stroke-width="2.4"/></g>
+    <circle cx="50" cy="64" r="3.6" fill="#16150f"/>
+    <circle cx="49" cy="63" r="1" fill="#4a4838"/>
+  </svg>`;
+  needleEl=$('gauge').querySelector('#needleG');
+}
+function setGauge(p){if(needleEl)needleEl.style.transform=`rotate(${-60+Math.max(0,Math.min(100,p))*1.2}deg)`;}
+
+/* ---------- карта фонда: 50 000 точек + одометр ---------- */
+const mo=$('mosaic'),moCtx=mo.getContext('2d');let moBase=null,samplesSeen=0;
+const moRand=new Float32Array(50000);                              // жребий точки: решает, будет ли она «промахом»
+const moCov=document.createElement('canvas');moCov.width=500;moCov.height=100;   // летопись прохода: раз закрашено — не переписывается
+const moCovCtx=moCov.getContext('2d');let moPainted=0;
+function buildMosaic(){
+  const img=moCtx.createImageData(500,100);
+  for(let i=0;i<50000;i++){const o=i*4,b=26+Math.random()*34;   // каждая точка — образец, лёгкий шум яркости
+    img.data[o]=b*0.5;img.data[o+1]=b;img.data[o+2]=b*0.55;img.data[o+3]=255;
+    moRand[i]=Math.random();}
+  moBase=img;moCtx.putImageData(moBase,0,0);
+}
+function drawMosaic(frac){
+  const npx=Math.floor(Math.max(0,Math.min(1,frac))*50000);
+  if(npx<moPainted){moCovCtx.clearRect(0,0,500,100);moPainted=0;}   // новая эпоха или сброс — чистый лист
+  if(npx>moPainted){
+    // докрашиваем только свежий участок — ошибкой ТЕКУЩЕГО момента; прошлое остаётся как было
+    const err=(100-(S.acc.length?S.acc[S.acc.length-1].v:10))/100;
+    moCovCtx.fillStyle='rgba(91,224,112,.28)';
+    for(let r=(moPainted/500)|0;r<=((npx-1)/500|0);r++){
+      const a=Math.max(moPainted,r*500)%500,b=Math.min(npx,(r+1)*500)-r*500;
+      moCovCtx.fillRect(a,r,b-a,1);}
+    moCovCtx.fillStyle='rgba(226,74,52,.75)';
+    for(let i=moPainted;i<npx;i++)if(moRand[i]<err)moCovCtx.fillRect(i%500,(i/500)|0,1,1);
+    moPainted=npx;
+  }
+  moCtx.putImageData(moBase,0,0);
+  moCtx.drawImage(moCov,0,0);
+  const rows=(npx/500)|0,rem=npx%500;
+  if(npx>0&&frac<1){moCtx.fillStyle='#c8ffd0';moCtx.fillRect(Math.max(0,rem-3),rows,3,1);}  // «головка чтения»
+}
+function renderOdo(){
+  const el=$('odo');
+  if(!el.children.length)for(let i=0;i<8;i++)el.appendChild(document.createElement('span'));
+  const s=String(Math.min(99999999,samplesSeen)).padStart(8,'0');
+  [...el.children].forEach((sp,i)=>{sp.textContent=s[i];sp.className=i===7?'last':'';});
+}
+
+/* ---------- протяжка плёнки при обучении ---------- */
+let filmQ=[],filmOff=0,filmLast=0,filmBag=[];
+function tileOf(sm){const c=document.createElement('canvas');c.width=28;c.height=28;const tc=c.getContext('2d');
+  const im=tc.createImageData(28,28);
+  for(let k=0;k<784;k++){const v=sm.x[k]*255,o=k*4;im.data[o]=v*0.45;im.data[o+1]=v*0.95;im.data[o+2]=v*0.5;im.data[o+3]=255;}
+  tc.putImageData(im,0,0);return c;}
+function nextFilmSample(){ // стратифицированная лента: цифры идут перетасованными десятками, без слипаний
+  if(!filmBag.length){filmBag=[0,1,2,3,4,5,6,7,8,9];
+    for(let i=9;i>0;i--){const j=(Math.random()*(i+1))|0;[filmBag[i],filmBag[j]]=[filmBag[j],filmBag[i]];}}
+  const d=filmBag.pop(),off=(Math.random()*TRAIN.length)|0;
+  for(let k=0;k<TRAIN.length;k++){const c=TRAIN[(off+k)%TRAIN.length];if(c.label===d)return c;}
+  return TRAIN[off];}
+function startFilmFlow(){filmQ=[];filmBag=[];for(let i=0;i<12;i++)filmQ.push(tileOf(nextFilmSample()));filmOff=0;}
+function filmTick(dt){
+  if(!filmQ.length)return;
+  const ctx=$('film').getContext('2d');
+  filmOff+=dt*0.055;                                   // скорость протяжки ленты
+  while(filmOff>=36){filmOff-=36;filmQ.shift();filmQ.push(tileOf(nextFilmSample()));}
+  ctx.fillStyle='#0a0c0a';ctx.fillRect(0,0,360,30);ctx.imageSmoothingEnabled=false;
+  for(let i=0;i<filmQ.length;i++){const x=i*36+7-filmOff;if(x>360||x<-28)continue;
+    ctx.drawImage(filmQ[i],x,3,24,24);ctx.strokeStyle='#1e241f';ctx.strokeRect(((x-0.5)|0)+0.5,2.5,25,25);}
+}
+
+/* ---------- киноплёнка фонда данных ---------- */
+function renderFilm(){
+  const c=$('film'),ctx=c.getContext('2d');
+  ctx.fillStyle='#0a0c0a';ctx.fillRect(0,0,360,30);
+  const tmp=document.createElement('canvas');tmp.width=28;tmp.height=28;const tc=tmp.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  // по одному образцу каждой цифры 0–9, по порядку — витрина фонда
+  const off=(Math.random()*TRAIN.length)|0;
+  for(let d=0;d<10;d++){
+    let sm=null;
+    for(let k=0;k<TRAIN.length;k++){const cand=TRAIN[(off+k)%TRAIN.length];if(cand.label===d){sm=cand;break;}}
+    if(!sm)continue;
+    const im=tc.createImageData(28,28);
+    for(let k=0;k<784;k++){const v=sm.x[k]*255,o=k*4;im.data[o]=v*0.45;im.data[o+1]=v*0.95;im.data[o+2]=v*0.5;im.data[o+3]=255;}
+    tc.putImageData(im,0,0);
+    ctx.drawImage(tmp,d*36+7,3,24,24);
+    ctx.strokeStyle='#1e241f';ctx.strokeRect(d*36+6.5,2.5,25,25);
+  }
+}
+
+/* ---------- включение станции ---------- */
+const bootT=[];const BT=(ms,f)=>bootT.push(setTimeout(f,ms));
+function powerOn(){
+  const sw=$('mainsSw');if(sw.classList.contains('on'))return;
+  sw.classList.add('on');SFX.mainsBig();closeHelper();
+  document.body.classList.add('booting');
+  /* секвенция света: щелчок → секунда темноты → цех проступает в полутьме → блоки вспыхивают */
+  BT(900,()=>{$('boot').classList.add('off');document.body.classList.remove('preboot');});   // темнота держится, слышен только гул
+  BT(2700,()=>{const b=$('boot');if(b)b.remove();});
+  BT(1250,()=>{document.body.classList.add('semi');SFX.floodLight();});                       // дальний контактор: полусвет падает, лампы стартуют
+  const blocks=[...document.querySelectorAll('.app>.top,.app>.tape,.app>.mocknote,.app .panel,.app>.footplate')];
+  let crtPlayed=false;
+  blocks.forEach((b,i)=>BT(2350+i*195,()=>{b.classList.add('lit');SFX.relay();
+    const crts=b.querySelectorAll('.crt');
+    if(crts.length){crts.forEach(c=>c.classList.add('warm'));if(!crtPlayed){crtPlayed=true;SFX.crt();}}
+  }));
+  const tEnd=2350+blocks.length*195;
+  BT(tEnd+120,()=>{document.querySelectorAll('.nx,.nixie').forEach(e=>e.classList.add('nixboot'));});   // nixie разгораются
+  BT(tEnd+200,()=>setGauge(100));                                                                       // самотест прибора
+  BT(tEnd+1100,()=>setGauge(0));
+  BT(tEnd+2000,()=>setGauge(S.acc[0]?S.acc[0].v:10));
+  BT(tEnd+300,()=>{S.finaleT=performance.now();S.finaleMode='mini';});                                  // тестовый пробег ламп
+  BT(tEnd+1600,()=>SFX.ready());                                                                        // бип-бип: к работе готов
+  BT(tEnd+2300,()=>showHelper('start'));                                                                // Нейронов: порядок действий
+  BT(tEnd+2100,()=>{document.body.classList.remove('booting','semi');
+    document.querySelectorAll('.nixboot').forEach(e=>e.classList.remove('nixboot'));
+    document.querySelectorAll('.crt.warm').forEach(e=>e.classList.remove('warm'));});
+}
+$('mainsSw').addEventListener('click',powerOn);
+/* клик по пульту во время каскада — мгновенное включение */
+document.addEventListener('click',e=>{
+  if(!document.body.classList.contains('booting'))return;
+  const b=$('boot');if(b&&b.contains(e.target))return;
+  bootT.forEach(clearTimeout);bootT.length=0;
+  if(b)b.remove();document.body.classList.remove('preboot','booting','semi');
+  document.querySelectorAll('.nixboot').forEach(el=>el.classList.remove('nixboot'));
+  document.querySelectorAll('.crt.warm').forEach(el=>el.classList.remove('warm'));
+  setGauge(S.acc[0]?S.acc[0].v:10);
+  setTimeout(()=>showHelper('start'),500);
+});
+
+/* init */
+$('cEp').value=CFG.epochs;$('cEpV').textContent=CFG.epochs;
+buildGauge();renderFilm();buildMosaic();renderOdo();buildViz();resetTraining();
+setLang((navigator.language||'ru').toLowerCase().startsWith('ru')?'ru':'en');   // дефолт — язык браузера, переключалка работает как прежде
+setTimeout(introHelper,700);   // тов. Нейронов встречает ещё до включения станции
+</script>
+</body>
+</html>
